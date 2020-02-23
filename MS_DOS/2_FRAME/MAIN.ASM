@@ -32,7 +32,7 @@ Start:		call Clear
 
 		mov di, (80 * 10 + 27) * 2
 		mov si, offset Message
-		mov cx, 19d
+		mov cx, 20d
 
 		rep movsw
 	
@@ -81,6 +81,6 @@ Clear		proc
 
 .data
 
-Message		db "A_s_s_e_m_b_l_e_r_ _i_s_ _g_r_e_a_t_!_", 0
+Message		db 'A.s.s.e.m.b.l.e.r. .i.s. .a.m.a.z.i.n.g.', 0d
 
 end		Start

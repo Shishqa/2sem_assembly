@@ -16,7 +16,7 @@ extrn DrawVerLine: proc
 ; Entry: DI - start addr
 ;	 CX - width
 ;	 DX - height
-; Destr: AX BX CX DX DI
+; Destr: CX DX DI
 ;==========================================================================
 
 DrawWindow		proc
@@ -33,6 +33,8 @@ HOR_BORDER	  equ 0cdh
 VER_BORDER	  equ 0bah
 INSIDE		  equ ' '
 SHADOW		  equ 0b1h
+
+			push ax bx
 
 			call SetVideo
 
@@ -98,6 +100,8 @@ LOWER_BORDER:		mov ax, (CORNER_COLOR_ATTR shl 8) or LEFT_DOWN_CORNER
 			add dx, 2d
 			mov cx, dx
 			call DrawHorLine
+
+			pop bx ax
 
 			ret
 			endp
