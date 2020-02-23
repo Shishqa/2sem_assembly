@@ -1,0 +1,66 @@
+Turbo Assembler	 Version 4.1	    02/22/20 12:41:04	    Page 1
+t_strlen.asm
+
+
+
+      1				     locals @@
+      2
+      3				     .186
+      4	0000			     .model tiny
+      5
+      6	0000			     .code
+      7
+      8				     extrn strlen: proc
+      9
+     10				     org 100h
+     11	0100  1E		     Start:	     push ds
+     12	0101  07				     pop es
+     13	0102  BF 0000r				     mov di, offset TestString
+     14
+     15	0105  E8 0000e				     call strlen
+     16
+     17	0108  B8 4C00				     mov ax, 4c00h
+     18	010B  CD 21				     int 21h
+     19
+     20	010D			     .data
+     21
+     22	0000  69 74 20 69 73 20	32+  TestString	     db	"it is 24 symbols lenght!", 0d
+     23	      34 20 73 79 6D 62	6F+
+     24	      6C 73 20 6C 65 6E	67+
+     25	      68 74 21 00
+     26
+     27				     end	     Start
+Turbo Assembler	 Version 4.1	    02/22/20 12:41:04	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/22/20"
+??FILENAME			  Text	 "t_strlen"
+??TIME				  Text	 "12:41:04"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _DATA
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 T_STRLEN
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+START				  Near	 DGROUP:0100
+STRLEN				  Near	 DGROUP:---- Extern
+TESTSTRING			  Byte	 DGROUP:0000
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0019 Word	  Public  DATA
+  _TEXT				  16  010D Word	  Public  CODE
+

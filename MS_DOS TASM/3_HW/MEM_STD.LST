@@ -1,0 +1,132 @@
+Turbo Assembler	 Version 4.1	    02/22/20 12:30:06	    Page 1
+mem_std.asm
+
+
+
+      1				     locals @@
+      2
+      3	0000			     .model tiny
+      4	0000			     .code
+      5
+      6				     public memchr
+      7				     public memcmp
+      8				     public memset
+      9				     public memcpy
+     10
+     11				     ;==========================================================================
+     12				     ; Looks within first n-bytes of memory block for the first	occurence
+     13				     ; of value
+     14				     ; Entry: AL - value
+     15				     ;	      ES:DI - absolute address of block
+     16				     ;	      CX - num of bytes	to be analyzed
+     17				     ; Exit:  ES:DI <- addr next to the	first occurence	of value
+     18				     ;	      ZF <- 1 if value is found
+     19				     ;		    0 if value is not found
+     20				     ; Destr: CX
+     21				     ;=========================================================================
+     22
+     23	0000			     memchr	     proc
+     24
+     25	0000  FC				     cld
+     26	0001  F2> AE				     repne scasb     ; while (ES:[DI++]	!= AL && CX) CX--;
+     27
+     28	0003  4F				     dec di
+     29
+     30	0004  C3				     ret
+     31	0005					     endp
+     32
+     33				     ;==========================================================================
+     34				     ; Compares	two blocks of memory of	equal size
+     35				     ; Entry: CX - size	of blocks
+     36				     ;	      ES:DI - absolute addr of the first block
+     37				     ;	      DS:SI - absolute addr of the second block
+     38				     ; Exit:  ZF <- 1 if blocks	are equal
+     39				     ;		    0 if blocks	are not	equal
+     40				     ;	      CF <- 0 if first byte that doesn't match is greater in block1
+     41				     ;		    1 if first byte that doesn't match is greater in block2
+     42				     ; Destr: CX DI SI
+     43				     ;==========================================================================
+     44
+     45	0005			     memcmp	     proc
+     46
+     47	0005  FC				     cld
+     48	0006  F3> A6				     repe cmpsb	     ; while (ES:[DI++]	== DS:[SI++]) CX++
+     49
+     50	0008  C3				     ret
+     51	0009					     endp
+     52
+     53				     ;===========================================================================
+     54				     ; Sets the	first n	bytes of memory	block to the specific value
+     55				     ; Entry: AL - value
+     56				     ;	      ES:DI - absolute address of block
+     57				     ;	      CX - num of bytes
+Turbo Assembler	 Version 4.1	    02/22/20 12:30:06	    Page 2
+mem_std.asm
+
+
+
+     58				     ; Destr: DI CX
+     59				     ;===========================================================================
+     60
+     61	0009			     memset	     proc
+     62
+     63	0009  FC				     cld
+     64	000A  F3> AA				     rep stosb	     ; while (CX--) ES:[DI++] =	AH
+     65
+     66	000C  C3				     ret
+     67	000D					     endp
+     68
+     69				     ;==========================================================================
+     70				     ; Copies n	bytes from one block of	memory to another
+     71				     ; Entry: ES:DI - destination absolute address
+     72				     ;	      DS:SI - source absolute address
+     73				     ;	      CX - num of bytes
+     74				     ; Destr: CX DI SI
+     75				     ;==========================================================================
+     76
+     77	000D			     memcpy	     proc
+     78
+     79	000D  FC				     cld
+     80	000E  F3> A4				     rep movsb	     ; while (CX--) ES:[DI++] =	DS:[SI++]
+     81
+     82	0010  C3				     ret
+     83	0011					     endp
+     84
+     85				     ;==========================================================================
+     86
+     87				     end
+Turbo Assembler	 Version 4.1	    02/22/20 12:30:06	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/22/20"
+??FILENAME			  Text	 "mem_std "
+??TIME				  Text	 "12:30:06"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 MEM_STD
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+MEMCHR				  Near	 DGROUP:0000
+MEMCMP				  Near	 DGROUP:0005
+MEMCPY				  Near	 DGROUP:000D
+MEMSET				  Near	 DGROUP:0009
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0011 Word	  Public  CODE
+

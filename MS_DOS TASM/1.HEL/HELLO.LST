@@ -1,0 +1,54 @@
+Turbo Assembler	 Version 4.1	    02/12/20 09:47:44	    Page 1
+hello.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5	0100  B4 09		     Start:		     mov ah, 09h			     ; puts(dx)
+      6	0102  BA 010Cr					     mov dx, offset HelloMsg
+      7	0105  CD 21					     int 21h
+      8
+      9	0107  B8 4C00					     mov ax, 4C00h			     ; return(0)
+     10	010A  CD 21					     int 21h
+     11
+     12	010C  48 65 6C 6C 6F 2C	20+  HelloMsg:		     db	'Hello,	World!'	, 13 , 10 , '$'	     ; "Hello, World!\r\n"
+     13	      57 6F 72 6C 64 21	0D+
+     14	      0A 24
+     15
+     16				     end		     Start
+Turbo Assembler	 Version 4.1	    02/12/20 09:47:44	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/12/20"
+??FILENAME			  Text	 "hello	  "
+??TIME				  Text	 "09:47:44"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 HELLO
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+HELLOMSG			  Near	 DGROUP:010C
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  011C Word	  Public  CODE
+

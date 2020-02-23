@@ -1,0 +1,62 @@
+Turbo Assembler	 Version 4.1	    02/17/20 11:19:17	    Page 1
+01_test1.asm
+
+
+
+      1				     .186
+      2				     locals @@
+      3
+      4	0000			     .model tiny
+      5	0000			     .code
+      6
+      7				     extrn   DrawLine: proc
+      8
+      9				     org 100h
+     10
+     11	0100  B8 4E3D		     Start:	     mov ax, (4eh shl 8) or '='
+     12	0103  BF 0195				     mov di, 80d * 5d +	5d
+     13	0106  B9 0028				     mov cx, 40d
+     14	0109  E8 0000e				     call DrawLine
+     15
+     16	010C  B8 4E2B				     mov ax, (4eh shl 8) or '+'
+     17	010F  BF 0235				     mov di, 80d * 7d +	5d
+     18	0112  B9 002D				     mov cx, 45d
+     19	0115  E8 0000e				     call DrawLine
+     20
+     21	0118  B8 4C00				     mov ax, 4c00h
+     22	011B  CD 21				     int 21h
+     23
+     24				     end	     Start
+Turbo Assembler	 Version 4.1	    02/17/20 11:19:17	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/17/20"
+??FILENAME			  Text	 "01_test1"
+??TIME				  Text	 "11:19:17"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 01_TEST1
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+DRAWLINE			  Near	 DGROUP:---- Extern
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  011D Word	  Public  CODE
+

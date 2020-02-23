@@ -1,0 +1,56 @@
+Turbo Assembler	 Version 4.1	    02/11/20 18:19:07	    Page 1
+02sem.asm
+
+
+
+      1
+      2	0000			     .model tiny
+      3	0000			     .code
+      4
+      5				     org 100h
+      6
+      7	0100  B8 B800		     Start:	     mov ax, 0b800h
+      8	0103  8E C0				     mov es, ax
+      9
+     10	0105  BB 07D0				     mov bx, (80d * 12d	+ 40d) * 2   ; b - base, только	по bx можно [bx]
+     11	0108  26: C6 07	41			     mov byte ptr es:[bx], 65d	     ; 65 == 'A'
+     12
+     13	010C  43				     inc bx
+     14
+     15	010D  26: C6 07	CE			     mov byte ptr es:[bx], 4eh or 80h	     ; color in	the nex	byte
+     16
+     17	0111  C3				     ret
+     18
+     19				     end	     Start
+Turbo Assembler	 Version 4.1	    02/11/20 18:19:07	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/11/20"
+??FILENAME			  Text	 "02sem	  "
+??TIME				  Text	 "18:19:07"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 02SEM
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0112 Word	  Public  CODE
+

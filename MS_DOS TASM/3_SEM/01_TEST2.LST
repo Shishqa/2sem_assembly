@@ -1,0 +1,70 @@
+Turbo Assembler	 Version 4.1	    02/17/20 11:19:18	    Page 1
+01_test2.asm
+
+
+
+      1				     .186
+      2				     locals @@
+      3
+      4	0000			     .model tiny
+      5
+      6	0000			     .code
+      7				     public DrawLine
+      8
+      9				     ;==========================================================================
+     10				     ; Draws a horizontal line on the screen
+     11				     ; Entry: AL - char	to draw	a line (ASCII)
+     12				     ;	      AH - color attr
+     13				     ;	      DI - char	place to start
+     14				     ;	      CX - line	length
+     15				     ; Destr: CX DI
+     16				     ;==========================================================================
+     17
+     18	0000			     DrawLine	     proc		     ; начало процедуры
+     19
+     20	0000  68 B800				     push 0b800h
+     21	0003  07				     pop es
+     22
+     23	0004  D1 E7				     shl di, 1
+     24	0006  FC				     cld		     ; will ++ di
+     25
+     26	0007  F3> AB				     rep stosw		     ; while (cx--) es:[di++] := ax
+     27
+     28	0009  C3				     ret
+     29	000A					     endp		     ; конец процедуры
+     30
+     31				     ;==========================================================================
+     32
+     33				     end
+Turbo Assembler	 Version 4.1	    02/17/20 11:19:18	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/17/20"
+??FILENAME			  Text	 "01_test2"
+??TIME				  Text	 "11:19:18"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 01_TEST2
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+DRAWLINE			  Near	 DGROUP:0000
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  000A Word	  Public  CODE
+

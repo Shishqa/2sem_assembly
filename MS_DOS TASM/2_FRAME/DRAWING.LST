@@ -1,0 +1,108 @@
+Turbo Assembler	 Version 4.1	    02/18/20 23:18:51	    Page 1
+drawing.asm
+
+
+
+      1				     locals @@
+      2
+      3				     .186
+      4
+      5	0000			     .model tiny
+      6	0000			     .code
+      7
+      8				     public SetVideo
+      9				     public DrawHorLine
+     10				     public DrawVerLine
+     11
+     12				     ;==========================================================================
+     13				     ; Sets ES pointer to the videosegment
+     14				     ; Exit: ES	<- VRAM	segment
+     15				     ;==========================================================================
+     16
+     17	0000			     SetVideo		     proc
+     18
+     19	0000  68 B800					     push 0b800h
+     20	0003  07					     pop es
+     21
+     22	0004  C3					     ret
+     23	0005						     endp
+     24
+     25				     ;==========================================================================
+     26				     ; Draws a horizontal line on the screen (make sure	videosegment is	set)
+     27				     ; Entry: AL - char	to draw	a line (ASCII code)
+     28				     ;	      AH - color attribute
+     29				     ;	      DI - char	address	of start
+     30				     ;	      CX - line	length
+     31				     ; Destr: CX DI DF
+     32				     ;==========================================================================
+     33
+     34	0005			     DrawHorLine	     proc
+     35
+     36	0005  FC					     cld
+     37
+     38	0006  F3> AB					     rep stosw
+     39
+     40	0008  C3					     ret
+     41	0009						     endp
+     42
+     43				     ;==========================================================================
+     44				     ; Draws vertical line on the screen (make sure videosegment is set)
+     45				     ; Entry: AL - char	to draw	a line (ASCII code)
+     46				     ;	      AH - color attribute
+     47				     ;	      DI - char	address	to start
+     48				     ;	      CX - line	length
+     49				     ; Destr: CX DI
+     50				     ;==========================================================================
+     51
+     52	0009			     DrawVerLine	     proc
+     53
+     54	0009  AB		     @@Next:		     stosw
+     55	000A  81 C7 009E				     add di, 158d
+     56	000E  E2 F9					     loop @@Next
+     57
+Turbo Assembler	 Version 4.1	    02/18/20 23:18:51	    Page 2
+drawing.asm
+
+
+
+     58	0010  C3					     ret
+     59	0011						     endp
+     60
+     61				     ;==========================================================================
+     62
+     63				     end
+Turbo Assembler	 Version 4.1	    02/18/20 23:18:51	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/18/20"
+??FILENAME			  Text	 "drawing "
+??TIME				  Text	 "23:18:51"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@NEXT				  Near	 DGROUP:0009
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 DRAWING
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+DRAWHORLINE			  Near	 DGROUP:0005
+DRAWVERLINE			  Near	 DGROUP:0009
+SETVIDEO			  Near	 DGROUP:0000
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0011 Word	  Public  CODE
+

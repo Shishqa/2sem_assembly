@@ -1,0 +1,97 @@
+Turbo Assembler	 Version 4.1	    02/17/20 19:13:55	    Page 1
+test.asm
+
+
+
+      1
+      2	0000			     .model tiny
+      3	0000			     .code
+      4
+      5				     extrn memchr: proc
+      6
+      7				     org 100h
+      8	0100  BF 0037r		     Start:		     mov di, offset String
+      9	0103  1E					     push ds
+     10	0104  07					     pop es
+     11	0105  B0 32					     mov al, '2'
+     12	0107  B9 0004					     mov cx, 4d
+     13	010A  FC					     cld
+     14
+     15	010B  E8 0000e					     call memchr
+     16	010E  75 14					     jnz symbol_not_found
+     17
+     18	0110  26: C6 45	FF 40	     symbol_found:	     mov byte ptr es:[di-1], '@'
+     19
+     20	0115  B4 09					     mov ah, 09h
+     21	0117  BA 0000r					     mov dx, offset OK_msg
+     22	011A  CD 21					     int 21h
+     23
+     24	011C  BA 0037r					     mov dx, offset String
+     25	011F  CD 21					     int 21h
+     26
+     27	0121  EB 08 90					     jmp return
+     28
+     29	0124  B4 09		     symbol_not_found:	     mov ah, 09h
+     30	0126  BA 0024r					     mov dx, offset NOK_msg
+     31	0129  CD 21					     int 21h
+     32
+     33	012B  B8 4C00		     return:		     mov ax, 4c00h
+     34	012E  CD 21					     int 21h
+     35
+     36				     ;--------------------------------------------------------------------------
+     37	0130			     .data
+     38	0000  53 79 6D 62 6F 6C	20+  OK_msg	     db	"Symbol	found and replaced to '@':", 13d, 10d, '$'
+     39	      66 6F 75 6E 64 20	61+
+     40	      6E 64 20 72 65 70	6C+
+     41	      61 63 65 64 20 74	6F+
+     42	      20 27 40 27 3A 0D	0A+
+     43	      24
+     44	0024  53 79 6D 62 6F 6C	20+  NOK_msg	     db	"Symbol	not found", 13d, 10d, '$'
+     45	      6E 6F 74 20 66 6F	75+
+     46	      6E 64 0D 0A 24
+     47
+     48	0037  48 65 6C 6C 6F 20	2A+  String	     db	"Hello * Goodbye = 42",	'$'
+     49	      20 47 6F 6F 64 62	79+
+     50	      65 20 3D 20 34 32	24
+     51				     ;--------------------------------------------------------------------------
+     52
+     53				     end		     Start
+Turbo Assembler	 Version 4.1	    02/17/20 19:13:55	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/17/20"
+??FILENAME			  Text	 "test	  "
+??TIME				  Text	 "19:13:55"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _DATA
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 TEST
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+MEMCHR				  Near	 DGROUP:---- Extern
+NOK_MSG				  Byte	 DGROUP:0024
+OK_MSG				  Byte	 DGROUP:0000
+RETURN				  Near	 DGROUP:012B
+START				  Near	 DGROUP:0100
+STRING				  Byte	 DGROUP:0037
+SYMBOL_FOUND			  Near	 DGROUP:0110
+SYMBOL_NOT_FOUND		  Near	 DGROUP:0124
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  004C Word	  Public  DATA
+  _TEXT				  16  0130 Word	  Public  CODE
+

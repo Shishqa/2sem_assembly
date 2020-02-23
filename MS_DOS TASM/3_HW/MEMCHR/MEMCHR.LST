@@ -1,0 +1,142 @@
+Turbo Assembler	 Version 4.1	    02/22/20 11:22:19	    Page 1
+memchr.asm
+
+
+
+      1				     locals @@
+      2
+      3	0000			     .model tiny
+      4	0000			     .code
+      5				     public memchr
+      6
+      7				     ;==========================================================================
+      8				     ; Looks within first n-bytes of memory block for the first	occurence
+      9				     ; of value
+     10				     ; Entry: AL - value
+     11				     ;	      ES:DI - absolute address of block
+     12				     ;	      CX - num of bytes	to be analyzed
+     13				     ; Exit:  ES:DI <- addr next to the	first occurence	of value
+     14				     ;	      ZF <- 1 if value is found	or 0 if	not (then DI is	pointing to byte
+     15				     ;		    next to the	last byte of memory block)
+     16				     ; Destr: CX DF
+     17				     ;==========================================================================
+     18
+     19	0000			     memchr	     proc
+     20
+     21	0000  FC				     cld
+     22	0001  F2> AE				     repne scasb     ; while (ES:[DI++]	!= AL && CX) CX--;
+     23
+     24	0003  C3				     ret
+     25	0004					     endp
+     26
+     27				     ;==========================================================================
+     28				     ; Compares	two blocks of memory of	equal size
+     29				     ; Entry: CX - size	of blocks
+     30				     ;	      ES:DI - absolute addr of the first block
+     31				     ;	      DS:SI - absolute addr of the second block
+     32				     ; Exit:  CX <- 0 if blocks	are equal
+     33				     ;		    1 if first byte that doesn't match is greater in block1
+     34				     ;		    2 if first byte that doesn't match is greater in block2
+     35				     ; Destr: DI SI
+     36				     ;==========================================================================
+     37
+     38	0004			     memcmp	     proc
+     39
+     40	0004  FC				     cld
+     41	0005  F3> A6				     repe cmpsb	     ; while (ES:[DI++]	== DS:[SI++]) CX++
+     42
+     43	0007  75 05				     jnz @@equal     ; b1 = b2
+     44	0009  77 09		     @@not_equal:    ja	 @@greater   ; b1 > b2
+     45	000B  EB 0D 90				     jmp @@less	     ; b1 < b2
+     46
+     47	000E  B9 0000		     @@equal:	     mov cx, 0d
+     48	0011  EB 0A 90				     jmp @@exit
+     49
+     50	0014  B9 0001		     @@greater:	     mov cx, 1d
+     51	0017  EB 04 90				     jmp @@exit
+     52
+     53	001A  B9 0002		     @@less:	     mov cx, 2d
+     54
+     55	001D  C3		     @@exit:	     ret
+     56	001E					     endp
+     57
+Turbo Assembler	 Version 4.1	    02/22/20 11:22:19	    Page 2
+memchr.asm
+
+
+
+     58				     ;===========================================================================
+     59				     ; Sets the	first n	bytes of memory	block to the specific value
+     60				     ; Entry: AL - value
+     61				     ;	      ES:DI - absolute address of block
+     62				     ;	      CX - num of bytes
+     63				     ; Destr: DI CX ZF
+     64				     ;===========================================================================
+     65
+     66	001E			     memset	     proc
+     67
+     68	001E  FC				     cld
+     69	001F  F3> AA				     rep stosb	     ; while (CX--) ES:[DI++] =	AH
+     70
+     71	0021  C3				     ret
+     72	0022					     endp
+     73
+     74				     ;==========================================================================
+     75				     ; Copies n	bytes from one block of	memory to another
+     76				     ; Entry: ES:DI - destination absolute address
+     77				     ;	      DS:SI - source absolute address
+     78				     ;	      CX - num of bytes
+     79				     ; Destr: CX DI SI ZF
+     80				     ;==========================================================================
+     81
+     82	0022			     memcpy	     proc
+     83
+     84	0022  FC				     cld
+     85	0023  F3> A4				     rep movsb	     ; while (CX--) ES:[DI++] =	DS:[SI++]
+     86
+     87	0025  C3				     ret
+     88	0026					     endp
+     89
+     90				     ;==========================================================================
+     91
+     92				     end
+Turbo Assembler	 Version 4.1	    02/22/20 11:22:19	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/22/20"
+??FILENAME			  Text	 "memchr  "
+??TIME				  Text	 "11:22:19"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@EQUAL				  Near	 DGROUP:000E
+@@EXIT				  Near	 DGROUP:001D
+@@GREATER			  Near	 DGROUP:0014
+@@LESS				  Near	 DGROUP:001A
+@@NOT_EQUAL			  Near	 DGROUP:0009
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 MEMCHR
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+MEMCHR				  Near	 DGROUP:0000
+MEMCMP				  Near	 DGROUP:0004
+MEMCPY				  Near	 DGROUP:0022
+MEMSET				  Near	 DGROUP:001E
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0026 Word	  Public  CODE
+
