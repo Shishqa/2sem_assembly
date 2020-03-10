@@ -8,7 +8,6 @@ locals @@
 public SetVideo
 public DrawHorLine
 public DrawVerLine
-public CodeEnd
 
 ;==========================================================================
 ; Sets ES pointer to the videosegment
@@ -68,7 +67,6 @@ DrawVerLine		proc
 ; Destr:
 ;==========================================================================
 
-CodeEnd:
 end
 
 

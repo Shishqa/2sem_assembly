@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/23/20 19:51:40	    Page 1
+Turbo Assembler	 Version 4.1	    02/25/20 16:39:12	    Page 1
 window.asm
 
 
@@ -60,7 +60,7 @@ window.asm
      55	001B  83 E9 02					     sub cx, 2d
      56
      57	001E  81 C7 009C				     add di, 156d
-Turbo Assembler	 Version 4.1	    02/23/20 19:51:40	    Page 2
+Turbo Assembler	 Version 4.1	    02/25/20 16:39:12	    Page 2
 window.asm
 
 
@@ -118,7 +118,7 @@ window.asm
     108				     ;==========================================================================
     109
     110				     end
-Turbo Assembler	 Version 4.1	    02/23/20 19:51:40	    Page 3
+Turbo Assembler	 Version 4.1	    02/25/20 16:39:12	    Page 3
 Symbol Table
 
 
@@ -126,9 +126,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/23/20"
+??DATE				  Text	 "02/25/20"
 ??FILENAME			  Text	 "window  "
-??TIME				  Text	 "19:51:40"
+??TIME				  Text	 "16:39:12"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@NEXT				  Near	 DGROUP:0026

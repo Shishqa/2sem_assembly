@@ -1,0 +1,170 @@
+Turbo Assembler	 Version 4.1	    03/03/20 15:40:39	    Page 1
+window.asm
+
+
+
+      1				     locals @@
+      2
+      3				     .186
+      4
+      5	0000			     .model tiny
+      6	0000			     .code
+      7
+      8				     public DrawWindow
+      9
+     10				     extrn SetVideo: proc
+     11				     extrn DrawHorLine:	proc
+     12				     extrn DrawVerLine:	proc
+     13
+     14				     ;==========================================================================
+     15				     ; Draws a window on the screen
+     16				     ; Entry: DI - start addr
+     17				     ;	      CX - width
+     18				     ;	      DX - height
+     19				     ; Destr: CX DX DI ES
+     20				     ;==========================================================================
+     21
+     22	0000			     DrawWindow	     proc
+     23
+     24	      =003B		     CORNER_COLOR_ATTR equ 3bh
+     25	      =0070		     INSIDE_COLOR_ATTR equ 70h
+     26	      =0014		     SHADOW_COLOR_ATTR equ 14h
+     27
+     28	      =00C9		     LEFT_UP_CORNER    equ 0c9h
+     29	      =00BB		     RIGHT_UP_CORNER   equ 0bbh
+     30	      =00C8		     LEFT_DOWN_CORNER  equ 0c8h
+     31	      =00BC		     RIGHT_DOWN_CORNER equ 0bch
+     32	      =00CD		     HOR_BORDER	       equ 0cdh
+     33	      =00BA		     VER_BORDER	       equ 0bah
+     34	      =0020		     INSIDE	       equ ' '
+     35	      =00B1		     SHADOW	       equ 0b1h
+     36
+     37	0000  50 53				     push    ax	bx
+     38
+     39	0002  E8 0000e				     call    SetVideo
+     40
+     41	0005  B8 3BC9		     UPPER_BORDER:   mov     ax, (CORNER_COLOR_ATTR shl	8) or LEFT_UP_CORNER
+     42	0008  AB				     stosw
+     43
+     44	0009  51				     push    cx
+     45	000A  B0 CD				     mov     al, HOR_BORDER
+     46	000C  83 E9 02				     sub     cx, 2
+     47	000F  E8 0000e				     call    DrawHorLine
+     48	0012  59				     pop     cx
+     49
+     50	0013  B0 BB				     mov     al, RIGHT_UP_CORNER
+     51	0015  AB				     stosw
+     52
+     53	0016  87 CA		     IN_WINDOW:	     xchg    cx, dx
+     54	0018  83 EA 02				     sub     dx, 2d
+     55	001B  83 E9 02				     sub     cx, 2d
+     56
+     57	001E  81 C7 009C			     add     di, 156d
+Turbo Assembler	 Version 4.1	    03/03/20 15:40:39	    Page 2
+window.asm
+
+
+
+     58	0022  2B FA				     sub     di, dx
+     59	0024  2B FA				     sub     di, dx
+     60
+     61	0026  8B D9		     @@Next:	     mov     bx, cx
+     62
+     63	0028  B8 3BBA				     mov     ax, (CORNER_COLOR_ATTR shl	8) or VER_BORDER
+     64	002B  AB				     stosw
+     65
+     66	002C  B8 7020				     mov     ax, (INSIDE_COLOR_ATTR shl	8) or INSIDE
+     67	002F  8B CA				     mov     cx, dx
+     68	0031  E8 0000e				     call    DrawHorLine
+     69
+     70	0034  B8 3BBA				     mov     ax, (CORNER_COLOR_ATTR shl	8) or VER_BORDER
+     71	0037  AB				     stosw
+     72
+     73	0038  B8 14B1				     mov     ax, (SHADOW_COLOR_ATTR shl	8) or SHADOW
+     74	003B  AB				     stosw
+     75
+     76	003C  81 C7 009A			     add     di, 154d
+     77	0040  2B FA				     sub     di, dx
+     78	0042  2B FA				     sub     di, dx
+     79
+     80	0044  8B CB				     mov     cx, bx
+     81	0046  E2 DE				     loop    @@Next
+     82
+     83	0048  B8 3BC8		     LOWER_BORDER:   mov     ax, (CORNER_COLOR_ATTR shl	8) or LEFT_DOWN_CORNER
+     84	004B  AB				     stosw
+     85
+     86	004C  B0 CD				     mov     al, HOR_BORDER
+     87	004E  8B CA				     mov     cx, dx
+     88	0050  E8 0000e				     call    DrawHorLine
+     89
+     90	0053  B0 BC				     mov     al, RIGHT_DOWN_CORNER
+     91	0055  AB				     stosw
+     92
+     93	0056  B8 14B1				     mov     ax, (SHADOW_COLOR_ATTR shl	8) or SHADOW
+     94	0059  AB				     stosw
+     95
+     96	005A  81 C7 009C			     add     di, 156d
+     97	005E  2B FA				     sub     di, dx
+     98	0060  2B FA				     sub     di, dx
+     99
+    100	0062  83 C2 02				     add     dx, 2d
+    101	0065  8B CA				     mov     cx, dx
+    102	0067  E8 0000e				     call    DrawHorLine
+    103
+    104	006A  5B 58				     pop     bx	ax
+    105
+    106	006C  C3				     ret
+    107	006D					     endp
+    108				     ;==========================================================================
+    109
+    110				     end
+Turbo Assembler	 Version 4.1	    03/03/20 15:40:39	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "03/03/20"
+??FILENAME			  Text	 "window  "
+??TIME				  Text	 "15:40:39"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@NEXT				  Near	 DGROUP:0026
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 WINDOW
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+CORNER_COLOR_ATTR		  Number 003B
+DRAWHORLINE			  Near	 DGROUP:---- Extern
+DRAWVERLINE			  Near	 DGROUP:---- Extern
+DRAWWINDOW			  Near	 DGROUP:0000
+HOR_BORDER			  Number 00CD
+INSIDE				  Number 0020
+INSIDE_COLOR_ATTR		  Number 0070
+IN_WINDOW			  Near	 DGROUP:0016
+LEFT_DOWN_CORNER		  Number 00C8
+LEFT_UP_CORNER			  Number 00C9
+LOWER_BORDER			  Near	 DGROUP:0048
+RIGHT_DOWN_CORNER		  Number 00BC
+RIGHT_UP_CORNER			  Number 00BB
+SETVIDEO			  Near	 DGROUP:---- Extern
+SHADOW				  Number 00B1
+SHADOW_COLOR_ATTR		  Number 0014
+UPPER_BORDER			  Near	 DGROUP:0005
+VER_BORDER			  Number 00BA
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  006D Word	  Public  CODE
+

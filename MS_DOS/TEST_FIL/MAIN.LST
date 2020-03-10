@@ -1,0 +1,72 @@
+Turbo Assembler	 Version 4.1	    02/29/20 12:35:00	    Page 1
+main.asm
+
+
+
+      1
+      2				     locals @@
+      3
+      4				     .186
+      5	0000			     .model tiny
+      6
+      7	0000			     .code
+      8
+      9				     org 100h
+     10	0100  B8 3D01		     Start:	     mov ax, 3d01h
+     11	0103  BA 0119r				     mov dx, offset FileSpec
+     12
+     13	0106  CD 21				     int 21h
+     14
+     15	0108  8B D8				     mov bx, ax
+     16	010A  B4 40				     mov ah, 40h
+     17	010C  B9 0005				     mov cx, 5d
+     18	010F  BA 012Er				     mov dx, offset TestStr
+     19
+     20	0112  CD 21				     int 21h
+     21
+     22	0114  B4 3E				     mov ah, 3eh
+     23
+     24	0116  CD 21				     int 21h
+     25
+     26	0118  C3				     ret
+     27
+     28	0119  57 3A 5C 54 45 53	54+  FileSpec	     db	"W:\TEST_FIL\test.txt",	0
+     29	      5F 46 49 4C 5C 74	65+
+     30	      73 74 2E 74 78 74	00
+     31	012E  68 65 6C 6C 6F	     TestStr	     db	"hello"
+     32
+     33				     end	     Start
+Turbo Assembler	 Version 4.1	    02/29/20 12:35:00	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/29/20"
+??FILENAME			  Text	 "main	  "
+??TIME				  Text	 "12:34:59"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 MAIN
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+FILESPEC			  Byte	 DGROUP:0119
+START				  Near	 DGROUP:0100
+TESTSTR				  Byte	 DGROUP:012E
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0133 Word	  Public  CODE
+

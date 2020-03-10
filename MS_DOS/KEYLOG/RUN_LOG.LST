@@ -1,0 +1,73 @@
+Turbo Assembler	 Version 4.1	    03/03/20 15:40:43	    Page 1
+run_log.asm
+
+
+
+      1
+      2				     locals @@
+      3
+      4				     .186
+      5	0000			     .model tiny
+      6
+      7	0000			     .code
+      8
+      9				     extrn HookInt: proc
+     10				     extrn Logger:  proc
+     11				     extrn Printer: proc
+     12
+     13				     extrn CodeEnd
+     14
+     15				     org 100h
+     16	0100  BB 0009		     Start:	     mov     bx, 09h
+     17	0103  BE 0000e				     mov     si, offset	Logger
+     18
+     19	0106  E8 0000e				     call    HookInt		     ; hooking interrupt 09h
+     20
+     21	0109  BB 001C				     mov     bx, 28d
+     22	010C  BE 0000e				     mov     si, offset	Printer
+     23
+     24	010F  E8 0000e				     call    HookInt
+     25
+     26	0112  B8 3100				     mov     ax, 3100h
+     27	0115  BA 0000e				     mov     dx, offset	CodeEnd	     ; DX <- size of code
+     28	0118  C1 EA 04				     shr     dx, 4		     ; which will stay resident
+     29	011B  42				     inc     dx
+     30	011C  CD 21				     int     21h		     ; staying resident
+     31
+     32				     end	     Start
+Turbo Assembler	 Version 4.1	    03/03/20 15:40:43	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "03/03/20"
+??FILENAME			  Text	 "run_log "
+??TIME				  Text	 "15:40:43"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 RUN_LOG
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+CODEEND				  Word	 DGROUP:---- Extern
+HOOKINT				  Near	 DGROUP:---- Extern
+LOGGER				  Near	 DGROUP:---- Extern
+PRINTER				  Near	 DGROUP:---- Extern
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  011E Word	  Public  CODE
+

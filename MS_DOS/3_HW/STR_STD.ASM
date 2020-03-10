@@ -69,13 +69,24 @@ strchr		proc
 
 strcmp		proc
 
-		push di
-		call strlen
-		pop di
+@@loop:		mov 	ch, byte ptr es:[di]
+		mov 	cl, byte ptr ds:[si]
+		add	cl, ch
+		cmp	cl, 0
+		je	@@end
 
-		inc cx
-		call memcmp		
+		cmpsb
+		jz	@@loop
+				
+
+		;push di
+		;call strlen
+		;pop di
+	
+		;inc cx
+		;call memcmp		
 		
+@@end:		ret
 		endp
 
 ;==========================================================================

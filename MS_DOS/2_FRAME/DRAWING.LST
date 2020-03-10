@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/18/20 23:18:51	    Page 1
+Turbo Assembler	 Version 4.1	    02/25/20 12:24:38	    Page 1
 drawing.asm
 
 
@@ -60,7 +60,7 @@ drawing.asm
      55	000A  81 C7 009E				     add di, 158d
      56	000E  E2 F9					     loop @@Next
      57
-Turbo Assembler	 Version 4.1	    02/18/20 23:18:51	    Page 2
+Turbo Assembler	 Version 4.1	    02/25/20 12:24:38	    Page 2
 drawing.asm
 
 
@@ -71,7 +71,7 @@ drawing.asm
      61				     ;==========================================================================
      62
      63				     end
-Turbo Assembler	 Version 4.1	    02/18/20 23:18:51	    Page 3
+Turbo Assembler	 Version 4.1	    02/25/20 12:24:38	    Page 3
 Symbol Table
 
 
@@ -79,9 +79,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/18/20"
+??DATE				  Text	 "02/25/20"
 ??FILENAME			  Text	 "drawing "
-??TIME				  Text	 "23:18:51"
+??TIME				  Text	 "12:24:37"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@NEXT				  Near	 DGROUP:0009

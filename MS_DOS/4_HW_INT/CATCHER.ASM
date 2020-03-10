@@ -10,18 +10,31 @@ extrn	DrawWindow: proc
 extrn 	CodeEnd
 
 org 100h
-Start:		xor ax, ax
-		mov es, ax			; es -> 0
+Start:		mov bx, 09h
+		mov si, offset Catch09int
+		call CatchInt 
 
-		mov bx, 9 * 4			; int09H in ISR table
+;==========================================================================
+; Interrupt catcher
+; Entry: BX - interrupt number
+;	 CS:SI - address of new interrupt handler
+; Destr: AX ES
+;==========================================================================
+
+CatchInt	proc
+
+		shl bx, 2
+
+		xor ax, ax
+		mov es, ax
 
 		cli
-		mov ax, word ptr es:[bx]
-		mov Old09int, ax
-		mov ax, word ptr es:[bx+2]
-		mov Old09int+2, ax 
+		;mov ax, word ptr es:[bx]
+		;mov OldInt, ax
+		;mov ax, word ptr es:[bx+2]
+		;mov OldInt+2, ax 
 
-		mov word ptr es:[bx], offset Catch09int
+		mov word ptr es:[bx],   si
 		mov word ptr es:[bx+2], cs
 		sti
 
@@ -30,6 +43,8 @@ Start:		xor ax, ax
 		shr dx, 4
 		inc dx				
 		int 21h				; Staying resident
+
+		endp
 
 ;==========================================================================
 ; Converts al 0-3 bits to 1-9A-F hex format
@@ -50,6 +65,8 @@ toHex		proc
 @@exit:		ret
 		endp
 
+;==========================================================================
+; Int09h catcher
 ;==========================================================================
 
 Catch09int	proc
@@ -92,10 +109,7 @@ Catch09int	proc
 
 		pop es di dx cx bx ax
 		
-		db 0eah
-Old09int	dw 0h
-		dw 0h
-
+		iret
 		endp
 
 ;==========================================================================

@@ -81,6 +81,6 @@ Clear		proc
 
 .data
 
-Message		db 'A.s.s.e.m.b.l.e.r. .i.s. .a.m.a.z.i.n.g.', 0d
+Message		db 'A_s_s_e_m_b_l_e_r_ _i_s_ _a_m_a_z_i_n_g_', 0d
 
 end		Start

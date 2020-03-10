@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/23/20 14:58:54	    Page 1
+Turbo Assembler	 Version 4.1	    02/25/20 12:24:35	    Page 1
 main.asm
 
 
@@ -60,7 +60,7 @@ main.asm
      55	0141  E2 FE		     @@next:	     loop @@next
      56
      57	0143  C3				     ret
-Turbo Assembler	 Version 4.1	    02/23/20 14:58:54	    Page 2
+Turbo Assembler	 Version 4.1	    02/25/20 12:24:35	    Page 2
 main.asm
 
 
@@ -91,15 +91,15 @@ main.asm
      81
      82	0153			     .data
      83
-     84	0000  41 2E 73 2E 73 2E	65+  Message	     db	'A.s.s.e.m.b.l.e.r. .i.s. .a.m.a.z.i.n.g.', 0d
-     85	      2E 6D 2E 62 2E 6C	2E+
-     86	      65 2E 72 2E 20 2E	69+
-     87	      2E 73 2E 20 2E 61	2E+
-     88	      6D 2E 61 2E 7A 2E	69+
-     89	      2E 6E 2E 67 2E 00
+     84	0000  41 5F 73 5F 73 5F	65+  Message	     db	'A_s_s_e_m_b_l_e_r_ _i_s_ _a_m_a_z_i_n_g_', 0d
+     85	      5F 6D 5F 62 5F 6C	5F+
+     86	      65 5F 72 5F 20 5F	69+
+     87	      5F 73 5F 20 5F 61	5F+
+     88	      6D 5F 61 5F 7A 5F	69+
+     89	      5F 6E 5F 67 5F 00
      90
      91				     end	     Start
-Turbo Assembler	 Version 4.1	    02/23/20 14:58:54	    Page 3
+Turbo Assembler	 Version 4.1	    02/25/20 12:24:35	    Page 3
 Symbol Table
 
 
@@ -107,9 +107,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/23/20"
+??DATE				  Text	 "02/25/20"
 ??FILENAME			  Text	 "main	  "
-??TIME				  Text	 "14:58:54"
+??TIME				  Text	 "12:24:35"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@NEXT				  Near	 DGROUP:010C

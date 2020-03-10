@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/22/20 12:43:12	    Page 1
+Turbo Assembler	 Version 4.1	    03/03/20 17:51:58	    Page 1
 str_std.asm
 
 
@@ -60,7 +60,7 @@ str_std.asm
      55
      56	0019  C3				     ret
      57	001A					     endp
-Turbo Assembler	 Version 4.1	    02/22/20 12:43:12	    Page 2
+Turbo Assembler	 Version 4.1	    03/03/20 17:51:58	    Page 2
 str_std.asm
 
 
@@ -79,37 +79,48 @@ str_std.asm
      69
      70	001A			     strcmp	     proc
      71
-     72	001A  57				     push di
-     73	001B  E8 FFE2				     call strlen
-     74	001E  5F				     pop di
-     75
-     76	001F  41				     inc cx
-     77	0020  E8 0000e				     call memcmp
-     78
-     79	0023					     endp
+     72	001A  26: 8A 2D		     @@loop:	     mov     ch, byte ptr es:[di]
+     73	001D  8A 0C				     mov     cl, byte ptr ds:[si]
+     74	001F  02 CD				     add     cl, ch
+     75	0021  80 F9 00				     cmp     cl, 0
+     76	0024  74 03				     je	     @@end
+     77
+     78	0026  A6				     cmpsb
+     79	0027  74 F1				     jz	     @@loop
      80
-     81				     ;==========================================================================
-     82				     ; Copies null-terminated string to	the destination
-     83				     ; Entry: ES:DI - destination absolute address
-     84				     ;	      DS:SI - source absolute address
-     85				     ; Destr: CX DI SI
-     86				     ;==========================================================================
-     87
-     88	0023			     strcpy	     proc
-     89
-     90	0023  57				     push di
-     91	0024  E8 FFD9				     call strlen
-     92	0027  5F				     pop di
-     93
-     94	0028  E8 0000e				     call memcpy
-     95
-     96	002B  C3				     ret
-     97	002C					     endp
+     81
+     82						     ;push di
+     83						     ;call strlen
+     84						     ;pop di
+     85
+     86						     ;inc cx
+     87						     ;call memcmp
+     88
+     89	0029  C3		     @@end:	     ret
+     90	002A					     endp
+     91
+     92				     ;==========================================================================
+     93				     ; Copies null-terminated string to	the destination
+     94				     ; Entry: ES:DI - destination absolute address
+     95				     ;	      DS:SI - source absolute address
+     96				     ; Destr: CX DI SI
+     97				     ;==========================================================================
      98
-     99				     ;==========================================================================
+     99	002A			     strcpy	     proc
     100
-    101				     end
-Turbo Assembler	 Version 4.1	    02/22/20 12:43:12	    Page 3
+    101	002A  57				     push di
+    102	002B  E8 FFD2				     call strlen
+    103	002E  5F				     pop di
+    104
+    105	002F  E8 0000e				     call memcpy
+    106
+    107	0032  C3				     ret
+    108	0033					     endp
+    109
+    110				     ;==========================================================================
+    111
+    112				     end
+Turbo Assembler	 Version 4.1	    03/03/20 17:51:58	    Page 3
 Symbol Table
 
 
@@ -117,11 +128,13 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/22/20"
+??DATE				  Text	 "03/03/20"
 ??FILENAME			  Text	 "str_std "
-??TIME				  Text	 "12:43:12"
+??TIME				  Text	 "17:51:58"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
+@@END				  Near	 DGROUP:0029
+@@LOOP				  Near	 DGROUP:001A
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0101H
@@ -139,12 +152,12 @@ MEMCPY				  Near	 DGROUP:---- Extern
 MEMSET				  Near	 DGROUP:---- Extern
 STRCHR				  Near	 DGROUP:0011
 STRCMP				  Near	 DGROUP:001A
-STRCPY				  Near	 DGROUP:0023
+STRCPY				  Near	 DGROUP:002A
 STRLEN				  Near	 DGROUP:0000
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  002C Word	  Public  CODE
+  _TEXT				  16  0033 Word	  Public  CODE
 

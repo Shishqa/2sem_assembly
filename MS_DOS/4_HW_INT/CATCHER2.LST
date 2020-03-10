@@ -1,0 +1,172 @@
+Turbo Assembler	 Version 4.1	    02/25/20 17:14:53	    Page 1
+catcher2.asm
+
+
+
+      1
+      2				     locals @@
+      3
+      4				     .186
+      5	0000			     .model tiny
+      6
+      7	0000			     .code
+      8
+      9				     extrn   DrawWindow: proc
+     10				     extrn   CodeEnd
+     11
+     12				     org 100h
+     13	0100  BB 0009		     Start:	     mov bx, 09h
+     14	0103  BE 0131r				     mov si, offset Catch09int
+     15	0106  E8 0000				     call CatchInt
+     16
+     17				     ;==========================================================================
+     18				     ; Interrupt catcher
+     19				     ; Entry: BX - interrupt number
+     20				     ;	      CS:SI - address of new interrupt handler
+     21				     ; Destr: AX ES DX
+     22				     ;==========================================================================
+     23
+     24	0109			     CatchInt	     proc
+     25
+     26	0109  C1 E3 02				     shl bx, 2
+     27
+     28	010C  33 C0				     xor ax, ax
+     29	010E  8E C0				     mov es, ax
+     30
+     31	0110  FA				     cli
+     32						     ;mov ax, word ptr es:[bx]
+     33						     ;mov OldInt, ax
+     34						     ;mov ax, word ptr es:[bx+2]
+     35						     ;mov OldInt+2, ax
+     36
+     37	0111  26: 89 37				     mov word ptr es:[bx],   si
+     38	0114  26: 8C 4F	02			     mov word ptr es:[bx+2], cs
+     39	0118  FB				     sti
+     40
+     41	0119  B8 3100				     mov ax, 3100h		     ; int21H -	31 (resident)
+     42	011C  BA 0000e				     mov dx, offset CodeEnd
+     43	011F  C1 EA 04				     shr dx, 4
+     44	0122  42				     inc dx
+     45	0123  CD 21				     int 21h			     ; Staying resident
+     46
+     47	0125					     endp
+     48
+     49				     ;==========================================================================
+     50				     ; Converts	al 0-3 bits to 1-9A-F hex format
+     51				     ; Entry: AL
+     52				     ; Exit:  AL <- correct ascii code
+     53				     ;==========================================================================
+     54
+     55	0125			     toHex	     proc
+     56
+     57	0125  3C 0A				     cmp al, 0ah
+Turbo Assembler	 Version 4.1	    02/25/20 17:14:53	    Page 2
+catcher2.asm
+
+
+
+     58	0127  72 05				     jb	@@digit
+     59
+     60	0129  04 37		     @@letter:	     add al, 55d
+     61	012B  EB 03 90				     jmp @@exit
+     62
+     63	012E  04 30		     @@digit:	     add al, 48d
+     64
+     65	0130  C3		     @@exit:	     ret
+     66	0131					     endp
+     67
+     68				     ;==========================================================================
+     69				     ; Int09h catcher
+     70				     ;==========================================================================
+     71
+     72	0131			     Catch09int	     proc
+     73
+     74	0131  50 53 51 52 57 06			     push ax bx	cx dx di es
+     75
+     76	0137  B8 B800				     mov ax, 0b800h
+     77	013A  8E C0				     mov es, ax
+     78
+     79	013C  E4 60				     in	al, 60h
+     80
+     81	013E  B9 000F				     mov cx, 15d
+     82	0141  BA 0005				     mov dx, 5d
+     83	0144  BF 01A4				     mov di, (80 * 2 + 50) * 2
+     84	0147  E8 0000e				     call DrawWindow
+     85
+     86	014A  8A D8				     mov bl, al
+     87	014C  C0 E8 04				     shr al, 4
+     88	014F  24 0F				     and al, 0fh
+     89	0151  E8 FFD1				     call toHex
+     90
+     91	0154  BF 02F2				     mov di, (80 * 4 + 57) * 2
+     92	0157  B4 4E				     mov ah, 4eh
+     93	0159  AB				     stosw
+     94
+     95	015A  8A C3				     mov al, bl
+     96	015C  24 0F				     and al, 0fh
+     97	015E  E8 FFC4				     call toHex
+     98	0161  AB				     stosw
+     99
+    100	0162  E4 61				     in	al, 61h
+    101	0164  8A E0				     mov ah, al
+    102	0166  0C 80				     or	al, 80h
+    103	0168  E6 61				     out 61h, al
+    104	016A  8A C4				     mov al, ah
+    105	016C  E6 61				     out 61h, al
+    106
+    107	016E  B0 20				     mov al, 20h
+    108	0170  E6 20				     out 20h, al
+    109
+    110	0172  07 5F 5A 59 5B 58			     pop es di dx cx bx	ax
+    111
+    112	0178  CF				     iret
+    113	0179					     endp
+    114
+Turbo Assembler	 Version 4.1	    02/25/20 17:14:53	    Page 3
+catcher2.asm
+
+
+
+    115				     ;==========================================================================
+    116
+    117				     end	     Start
+Turbo Assembler	 Version 4.1	    02/25/20 17:14:53	    Page 4
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/25/20"
+??FILENAME			  Text	 "catcher2"
+??TIME				  Text	 "17:14:53"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@DIGIT				  Near	 DGROUP:012E
+@@EXIT				  Near	 DGROUP:0130
+@@LETTER			  Near	 DGROUP:0129
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 CATCHER2
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+CATCH09INT			  Near	 DGROUP:0131
+CATCHINT			  Near	 DGROUP:0109
+CODEEND				  Word	 DGROUP:---- Extern
+DRAWWINDOW			  Near	 DGROUP:---- Extern
+START				  Near	 DGROUP:0100
+TOHEX				  Near	 DGROUP:0125
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0179 Word	  Public  CODE
+
