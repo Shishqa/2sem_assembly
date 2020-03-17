@@ -1,0 +1,29 @@
+     1                                  ; Declare external function
+     2                                          extern	printf		; the C function, to be called
+     3                                  
+     4                                          SECTION .data		; Data section, initialized variables
+     5                                  
+     6 00000000 0500000000000000        	a:	dq	5	; long int a=5;
+     7 00000008 613D256C642C207261-     fmt:    db "a=%ld, rax=%ld", 10, 0	; The printf format, "\n",'0'
+     7 00000011 783D256C640A00     
+     8                                  
+     9                                  
+    10                                          SECTION .text           ; Code section.
+    11                                  
+    12                                          global main		; the standard gcc entry point
+    13                                  main:				; the program label for the entry point
+    14 00000000 55                              push    rbp		; set up stack frame
+    15                                  	
+    16 00000001 488B0425[00000000]      	mov	rax,[a]		; put "a" from store into register
+    17 00000009 4883C002                	add	rax,2		; a+2  add constant 2
+    18 0000000D 48BF-                   	mov	rdi,fmt		; format for printf
+    18 0000000F [0800000000000000] 
+    19 00000017 488B3425[00000000]      	mov	rsi,[a]         ; first parameter for printf
+    20 0000001F 4889C2                  	mov	rdx,rax         ; second parameter for printf
+    21 00000022 B800000000              	mov	rax,0		; no xmm registers
+    22 00000027 E8(00000000)                    call    printf		; Call C function
+    23                                  
+    24 0000002C 5D                      	pop	rbp		; restore stack
+    25                                  
+    26 0000002D B800000000              	mov	rax,0		; normal, no error, return value
+    27 00000032 C3                      	ret			; return
