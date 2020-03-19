@@ -1,5 +1,5 @@
 ;;=========================================================================
-;; Put_b
+;; Put_u.asm
 ;;=========================================================================
 
             global  _put_b
@@ -14,7 +14,7 @@
 ;;=========================================================================
 ;; Writes unsigned int in binary representation to the console
 ;; Entry: edi <- int number to print
-;; Destr: 
+;; Destr: rax rdx rdi r9
 ;;=========================================================================
 
 _put_b:
@@ -26,7 +26,7 @@ _put_b:
 ;;=========================================================================
 ;; Writes unsigned int in decimal representation to the console
 ;; Entry: edi <- int number to print
-;; Destr: 
+;; Destr: rax rdx rdi r9
 ;;=========================================================================
 
 _put_u:
@@ -38,7 +38,7 @@ _put_u:
 ;;=========================================================================
 ;; Writes unsigned int in octal representation to the console
 ;; Entry: edi <- int number to print
-;; Destr: 
+;; Destr: rax rdx rdi r9
 ;;=========================================================================
 
 _put_o:
@@ -50,7 +50,7 @@ _put_o:
 ;;=========================================================================
 ;; Writes unsigned int in hexadecimal representation to the console
 ;; Entry: edi <- int number to print
-;; Destr: 
+;; Destr: rax rdx rdi r9
 ;;=========================================================================
 
 _put_x:

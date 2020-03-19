@@ -1,5 +1,5 @@
 ;;=========================================================================
-;; Put_u_base
+;; Put_u_base.asm
 ;;=========================================================================
 
             global  _put_u_base
@@ -14,17 +14,17 @@
 ;; Entry: edi <- int number to print
 ;;         dl <- base (<=16)
 ;;         dh <- binary degree if base is binary / 0 if not
-;; Destr: 
+;; Destr: rax rdx rdi r9
 ;;=========================================================================
 
 _put_u_base:
-            mov     rsi, Buffer
+            mov     rsi, OutputBuffer
             call    _itoa
 
             inc     rsi
             mov     byte [rsi], 0
 
-            mov     rdi, Buffer
+            mov     rdi, OutputBuffer
             call    _put_s
 
             ret
@@ -35,7 +35,8 @@ _put_u_base:
 
 MAX_BUF_LEN equ     33
 
-Buffer:     times   MAX_BUF_LEN db 0
+OutputBuffer:
+            times   MAX_BUF_LEN db 0
 
 ;;=========================================================================
 

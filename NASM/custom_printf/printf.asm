@@ -1,8 +1,8 @@
 ;;=========================================================================
-;; Custom Printf
+;; printf.asm                                           Shishqa, MIPT 2020
 ;;=========================================================================
 
-            global  _printf
+            global  printf
 
             extern  _put_s
             extern  _put_c
@@ -15,25 +15,32 @@
             section .text
 
 ;;=========================================================================
-;; Printf
-;; Entry: rdi <- format address (null terminated)
-;;        next: stdcall args
-;; Destr: 
+;; vanilla printf
+;; Entry: rdi <- format str address (null terminated)
+;;        stack <- args
+;; Destr: rax rbx rdx
 ;;=========================================================================
 
 printf:
             push    rbp
             mov     rbp, rsp
-            dec     rbp, 8
 
+            mov     qword [rbp-5*8], rsi
+            mov     qword [rbp-4*8], rdx
+            mov     qword [rbp-3*8], rcx
+            mov     qword [rbp-2*8], r8
+            mov     qword [rbp-1*8], r9
+
+            mov     r8, 5
+
+            sub     rbp, 5*8
+            sub     rsp, 5*8
+
+.printf_loop:
             mov     rax, rdi
-            call    parse_next
-
-            cmp     rsi, 0
-            je      .error
+            call    next_flag
 
             xor     bl, bl
-            dec     rdi
             xchg    byte [rdi], bl
 
             mov     rdi, rax
@@ -41,67 +48,138 @@ printf:
 
             xchg    byte [rdi], bl
 
-            mov     rbx, rdi
-            mov
+            cmp     byte [rdi], 0
+            je      .exit
 
+            inc     rdi
+            call    parse_flag
 
+            cmp     byte [rdi], SHIELD_FLAG
+            jne     .next_arg
+
+            inc     rdi
+            jmp     .printf_loop
+
+.next_arg:
+            inc     rdi
+            add     rbp, 8
+            dec     r8
+            cmp     r8, 0
+            jne     .printf_loop
+
+            add     rbp, 16
+            jmp     .printf_loop
+
+.exit:
+            add     rsp, 5*8
+            pop     rbp
+
+            ret
 
 
 ;;=========================================================================
-;; Parser
+;; Flag finder
 ;; Entry: rdi <- current cursor position
 ;; Exit:  rdi <- next format pos after format flag
-;;        rsi <- address of printer
 ;;=========================================================================
 
-parse_next:
+next_flag:
             cmp     byte [rdi], 0
             je      .exit
             cmp     byte [rdi], '%'
-            je      .get_format
+            je      .exit
             inc     rdi
-            jmp     parse_next
+            jmp     next_flag
+.exit:
+            ret
 
-.get_format:
-            inc     rdi
-            mov     al, byte [rdi]
-            xor     rcx, rcx
-.loop:
-            cmp     byte [FormatTable+rcx], 0
-            je      .error
+;;=========================================================================
+;; Flag parser
+;; Entry: rdi <- position where is flag
+;;        rbp <- argument position
+;; Destr: 
+;;=========================================================================
 
-            cmp     al, byte [FormatTable+rcx]
-            je      .checkout
-            add     rcx, 5
-            jmp     .loop
+SHIELD_FLAG equ '%'
 
-.checkout:
-            inc     rcx
-            mov     rsi, qword [FormatTable+rcx]
+CHAR_FLAG   equ 'c'
+CSTR_FLAG   equ 's'
+BINT_FLAG   equ 'b'
+OINT_FLAG   equ 'o'
+XINT_FLAG   equ 'x'
+UINT_FLAG   equ 'u'
+DINT_FLAG   equ 'd'
+
+parse_flag:
+            push    rdi
+            cmp     byte [rdi], SHIELD_FLAG
+            je      .is_shield
+            jmp     .is_flag
+
+.is_shield:
+            mov     rdi, procent
+            call    _put_s
             jmp     .exit
 
-.error:
-            mov     rsi, 0
+.is_flag:
+            xor     rcx, rcx
+            mov     al, byte [rdi]
+            mov     rdi, qword [rbp]
+
+.find_suitable_func:
+            cmp     byte [int_flag_table+rcx], 0
+            je      .flag_error
+
+            cmp     al, byte [int_flag_table+rcx]
+            je      .call_suitable_func
+
+            inc     rcx
+            jmp     .find_suitable_func
+
+.call_suitable_func:
+            call    qword [put_int_table+8*rcx]
+            jmp     .exit
+
+.flag_error:
+            mov     rax, 1
+            mov     rdi, 1
+            mov     rsi, ErrMsg
+            mov     rdx, ErrMsgLen
+            syscall
+
+            mov     rax, 60
+            xor     rdi, rdi
+            syscall
+
 .exit:
+            pop     rdi
+
             ret
 
 ;;-------------------------------------------------------------------------
 
             section .data
 
-FormatTable:
-            db 'c', dq _put_c
-            db 's', dq _put_s
-            db 'u', dq _put_u
-            db 'b', dq _put_b
-            db 'o', dq _put_o
-            db 'x', dq _put_x
-            db 'd', dq _put_d
-            db '%', dq 0
-            db 0
+procent:    db '%', 0
+
+int_flag_table:
+            db UINT_FLAG, DINT_FLAG, BINT_FLAG, OINT_FLAG, XINT_FLAG
+            db CHAR_FLAG, CSTR_FLAG,                                    0
+put_int_table:
+            dq _put_u,    _put_d,    _put_b,    _put_o,    _put_x
+            dq _put_c,    _put_s,                                       0
+
+
+ErrMsg:     db "Unknown flag! Terminate...", 10
+ErrMsgLen   equ $ - ErrMsg
 
 ;;=========================================================================
 
 
-            
+
+
+
+
+
+
 

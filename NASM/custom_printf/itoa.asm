@@ -1,5 +1,5 @@
 ;;=========================================================================
-;; Itoa implementation
+;; itoa.asm                                             Shishqa, MIPT 2020
 ;;=========================================================================
 
             default rel
@@ -11,40 +11,44 @@
 ;;=========================================================================
 ;; Convert unsigned int number to string
 ;; Entry: edi <- unsigned int number
-;;        rsi <- addr to store string
-;;         dx <- dh:binary base if binary, 0 if not|dl:base (<=16) 
-;; Destr: 
+;;        rsi <- addr of string buffer
+;;         dh <- binary degree of base if binary, 0 if not
+;;         dl <- base (<=16)
+;; Exit:  rsi -> addr of the last written symbol
+;; Destr: rax rdx rdi r9
 ;;=========================================================================
 
 _itoa:
             mov     r9, rsi
 
-            mov     byte [BASE], dl
-            cmp     dh, 0
-            je      .process
+            mov     byte [BASE], dl             ; BASE = DL
+            cmp     dh, 0                       ; !binary => ordinary_division
+            je      .ordinary_division          ; binary  => shift_division
 
-            dec     dword [BASE]
-            mov     byte [SHIFT], dh
+            dec     dword [BASE]                ; BASE = 11..11 (mask)
+            mov     byte [SHIFT], dh            ; SHIFT = DH
 
-.process_binary:
+.binary_division:
             xor     rdx, rdx
             mov     edx, edi
-            and     edx, dword [BASE]
+            and     edx, dword [BASE]           ; EDX = EDI % BASE
 
-            add     rdx, DIGITS
+            add     rdx, DIGITS                 ; RDX -> correct remainder digit
             mov     al, byte [rdx]
-            mov     byte [rsi], al
-            inc     rsi
+            mov     byte [rsi], al              ; correct digit -> output buffer
+            inc     rsi                         ; ++buf_ptr
 
-            xor     rcx, rcx
-            mov     cl, byte [SHIFT]
+            xor     rdx, rdx
+            mov     dl, byte [SHIFT]
 .divide:    shr     edi, 1
-            loop    .divide
+            dec     rdx
+            jnz     .divide
 
             cmp     edi, 0
-            jne     .process_binary
+            jne     .binary_division
             jmp     .exit
-.process:
+
+.ordinary_division:
             xor     rdx, rdx
             mov     eax, edi
             div     dword [BASE]
@@ -57,8 +61,9 @@ _itoa:
             inc     rsi
 
             cmp     edi, 0
-            jne     .process
+            jne     .ordinary_division
             jmp     .exit
+
 .exit:
             mov     rdi, r9
             dec     rsi
@@ -77,13 +82,12 @@ DIGITS:     db "0123456789ABCDEF"
 ;;=========================================================================
 ;; Reverse string
 ;; Entry: rdi <- string begin
-;;        rsi <- string end
-;; Destr: rsi rdi
+;;        rsi <- string end   (pointer to the last symbol)
+;; Destr: rax rdx rdi
 ;;=========================================================================
 
 reverse:
-            push    rdi
-            push    rsi
+            mov     rdx, rsi
 .loop:
             cmp     rdi, rsi
             jae     .exit
@@ -98,8 +102,7 @@ reverse:
             jmp     .loop
 
 .exit:
-            pop     rsi
-            pop     rdi
+            mov     rsi, rdx
             ret
 
 ;;=========================================================================
