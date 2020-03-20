@@ -31,7 +31,7 @@ printf:
             mov     qword [rbp-2*8], r8
             mov     qword [rbp-1*8], r9
 
-            mov     r8, 5
+            xor     r8, r8
 
             sub     rbp, 5*8
             sub     rsp, 5*8
@@ -63,8 +63,8 @@ printf:
 .next_arg:
             inc     rdi
             add     rbp, 8
-            dec     r8
-            cmp     r8, 0
+            inc     r8
+            cmp     r8, 5
             jne     .printf_loop
 
             add     rbp, 16
@@ -73,6 +73,8 @@ printf:
 .exit:
             add     rsp, 5*8
             pop     rbp
+
+            mov     rax, r8
 
             ret
 
