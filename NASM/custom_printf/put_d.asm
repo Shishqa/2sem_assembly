@@ -1,44 +1,44 @@
 ;;=========================================================================
-;; Put_d
+;; put_d.asm                                            Shishqa, MIPT 2020
 ;;=========================================================================
 
             global  _put_d
 
             extern  _put_u_base
-            extern  _put_s
+            extern  _put_c
 
             section .text
 
 ;;=========================================================================
 ;; Writes signed int in decimal representation to the console
-;; Entry: edi <- int number to print
-;; Destr: 
+;;
+;; ENTRY: ESI <- int number to print
+;; DESTR: RAX RBX RDX RSI RDI ; DF
 ;;=========================================================================
 
 _put_d:
-            mov     edx, 1 << 31
-            and     edx, edi
+            mov     edx, 0x80000000         ; EDX = highest bit mask
 
-            cmp     edx, 0
-            je      .positive
-.negative:
-            push    rdi
-            mov     rdi, NegMarker
-            call    _put_s
-            pop     rdi
+            and     edx, esi
+            cmp     edx, 0                  ; if the highest bit is 0,
+            je      .positive               ; the number is positive
 
-            neg     edi
+.negative:                                  ; else, the number is negative
+
+            push    rsi                     ; save RSI
+
+            mov     sil, '-'
+            call    _put_c                  ; print '-'
+
+            pop     rsi                     ; restore RSI
+            neg     esi                     ; ESI = -ESI
+
 .positive:
-            mov     dx, (0 << 8) | 10
+
+            mov     dx, (0 << 8) | 10       ; DL = 10, DH = 0
             call    _put_u_base
 
             ret
-
-;;-------------------------------------------------------------------------
-
-            section .data
-
-NegMarker:  db '-', 0
 
 ;;=========================================================================
 

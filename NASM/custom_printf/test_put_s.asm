@@ -1,19 +1,22 @@
 ;;=========================================================================
-;; Test put_s
+;; test_put_s.asm                                       Shishqa, MIPT 2020
 ;;=========================================================================
 
             default rel
 
             global  _start
             extern  _put_s
+            extern  _flush_buffer
 
             section .text
 
 ;;=========================================================================
 
 _start:
-            mov     rdi, Msg
+            mov     rsi, Msg
             call    _put_s
+
+            call    _flush_buffer
 
             mov     rax, 60
             xor     rdi, rdi

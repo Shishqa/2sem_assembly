@@ -1,16 +1,16 @@
 
 NASM_FLAGS = -felf64 -gdwarf
 
-all: test_printf clean
+all: test_printf tests clean
 
-MODULES = put_c.o put_s.o put_u.o put_d.o put_u_base.o itoa.o
+MODULES = put_chars.o put_u.o put_d.o put_u_base.o itoa.o
 
 test_printf: test_printf.o printf.o ${MODULES}
 	ld -o $@ $^
 
 tests: test_put_s test_put_c test_put_u test_put_b test_put_x test_put_o test_put_d
 
-U_BASE = put_u_base.o put_u.o put_s.o put_c.o itoa.o
+U_BASE = put_u_base.o put_u.o put_chars.o itoa.o
 
 test_put_d: ${U_BASE} test_put_d.o put_d.o
 	ld -o $@ $^
@@ -27,10 +27,10 @@ test_put_b: ${U_BASE} test_put_b.o
 test_put_u: ${U_BASE} test_put_u.o 
 	ld -o $@ $^
 
-test_put_c: put_c.o test_put_c.o
+test_put_c: put_chars.o test_put_c.o
 	ld -o $@ $^
 
-test_put_s: put_s.o put_c.o test_put_s.o
+test_put_s: put_chars.o test_put_s.o
 	ld -o $@ $^
 
 %.o: %.asm

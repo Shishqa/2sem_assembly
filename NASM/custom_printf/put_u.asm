@@ -1,5 +1,5 @@
 ;;=========================================================================
-;; Put_u.asm
+;; put_u.asm                                            Shishqa, MIPT 2020
 ;;=========================================================================
 
             global  _put_b
@@ -13,48 +13,52 @@
 
 ;;=========================================================================
 ;; Writes unsigned int in binary representation to the console
-;; Entry: edi <- int number to print
-;; Destr: rax rdx rdi r9
+;;
+;; ENTRY: ESI <- int number to print
+;; DESTR: RAX RBX RDX RSI RDI ; DF
 ;;=========================================================================
 
 _put_b:
-            mov     dx, (1 << 8) | 2
+            mov     dx, (1 << 8) | 2        ; DL = 2, DH = 1 (BASE = 2^1)
             call    _put_u_base
 
             ret
 
 ;;=========================================================================
 ;; Writes unsigned int in decimal representation to the console
-;; Entry: edi <- int number to print
-;; Destr: rax rdx rdi r9
+;;
+;; Entry: ESI <- int number to print
+;; Destr: RAX RBX RDX RSI RDI ; DF
 ;;=========================================================================
 
 _put_u:
-            mov     dx, (0 << 8) | 10
+            mov     dx, (0 << 8) | 10       ; DL = 10, DH = 0 (BASE = 10)
             call    _put_u_base
 
             ret
 
 ;;=========================================================================
 ;; Writes unsigned int in octal representation to the console
-;; Entry: edi <- int number to print
-;; Destr: rax rdx rdi r9
+;;
+;; ENTRY: ESI <- int number to print
+;; Destr: RAX RBX RDX RSI RDI ; DF
 ;;=========================================================================
 
 _put_o:
-            mov     dx, (3 << 8) | 8
+            mov     dx, (3 << 8) | 8        ; DL = 8, DH = 3 (BASE = 2^3)
             call    _put_u_base
 
             ret
 
 ;;=========================================================================
 ;; Writes unsigned int in hexadecimal representation to the console
-;; Entry: edi <- int number to print
-;; Destr: rax rdx rdi r9
+;;
+;; ENTRY: ESI <- int number to print
+;; DESTR: RAX RBX RDX RSI RDI ; DF
 ;;=========================================================================
 
 _put_x:
-            mov     dx, (4 << 8) | 16
+            mov     dx, (4 << 8) | 16       ; DL = 16, DH = 4 (BASE = 2^4)
             call    _put_u_base
 
             ret

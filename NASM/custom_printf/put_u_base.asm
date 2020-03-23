@@ -1,5 +1,5 @@
 ;;=========================================================================
-;; Put_u_base.asm
+;; put_u_base.asm                                       Shishqa, MIPT 2020
 ;;=========================================================================
 
             global  _put_u_base
@@ -11,21 +11,21 @@
 
 ;;=========================================================================
 ;; Writes unsigned int number in base representation to console
-;; Entry: edi <- int number to print
-;;         dl <- base (<=16)
-;;         dh <- binary degree if base is binary / 0 if not
-;; Destr: rax rdx rdi r9
+;;
+;; ENTRY: ESI <- int number to print
+;;         DH <- binary degree if base is binary / 0 if not
+;;         DL <- base (<= 16)
+;; DESTR: RAX RBX RDX RSI RDI ; DF
 ;;=========================================================================
 
 _put_u_base:
-            mov     rsi, OutputBuffer
-            call    _itoa
 
-            inc     rsi
-            mov     byte [rsi], 0
+            lea     rdi, [IntBuffer + (IntBufSize - 2)] ; RDI -> where number
+            call    _itoa                               ; will end.
+                                                        ; convert num to str
 
-            mov     rdi, OutputBuffer
-            call    _put_s
+            mov     rsi, rdi
+            call    _put_s                              ; print converted num
 
             ret
 
@@ -33,10 +33,9 @@ _put_u_base:
 
             section .data
 
-MAX_BUF_LEN equ     33
+IntBufSize  equ 33
 
-OutputBuffer:
-            times   MAX_BUF_LEN db 0
+IntBuffer:  times IntBufSize db 0
 
 ;;=========================================================================
 

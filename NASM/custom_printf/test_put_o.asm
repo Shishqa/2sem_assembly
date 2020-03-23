@@ -1,19 +1,22 @@
 ;;=========================================================================
-;; Test _put_o
+;; test_put_o.asm                                       Shishqa, MIPT 2020
 ;;=========================================================================
 
             default rel
 
             global  _start
             extern  _put_o
+            extern  _flush_buffer
 
             section .text
 
 ;;=========================================================================
 
 _start:
-            mov     edi, 1333
+            mov     esi, 1333
             call    _put_o
+
+            call    _flush_buffer
 
             mov     rax, 60
             xor     rdi, rdi

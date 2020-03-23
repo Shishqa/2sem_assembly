@@ -2,6 +2,16 @@
 ;; printf.asm                                           Shishqa, MIPT 2020
 ;;=========================================================================
 
+%macro      multipop 2
+
+            %rep %2
+
+                pop %1
+
+            %endrep
+
+%endmacro
+
             global  printf
 
             extern  _put_s
@@ -12,77 +22,93 @@
             extern  _put_x
             extern  _put_d
 
+            extern  _flush_buffer
+
             section .text
 
 ;;=========================================================================
-;; vanilla printf
-;; Entry: rdi <- format str address (null terminated)
-;;        stack <- args
-;; Destr: rax rbx rdx
+;; printf
+;;
+;; supports: %d %u %b %o %x %c %s %%
+;;
+;; ENTRY: RDI <- format string address (null terminated)
+;;        RSI <- 1st arg
+;;        ...
+;;   <stdcall seq>
+;;        ...
+;;         R9 <- 5th arg
+;;      STACK <- other args from right to left
+;; DESTR: RAX RBX RCX RDX RSI RDI R8 ; DF
 ;;=========================================================================
 
 printf:
             push    rbp
             mov     rbp, rsp
+            sub     rsp, 5*8                        ; init stack frame
 
             mov     qword [rbp-5*8], rsi
             mov     qword [rbp-4*8], rdx
             mov     qword [rbp-3*8], rcx
             mov     qword [rbp-2*8], r8
-            mov     qword [rbp-1*8], r9
+            mov     qword [rbp-1*8], r9             ; load args to memory
 
-            xor     r8, r8
+            xor     r8, r8                          ; R8 - arg counter
 
-            sub     rbp, 5*8
-            sub     rsp, 5*8
+            sub     rbp, 5*8                        ; RBP -> first arg
 
 .printf_loop:
+
             mov     rax, rdi
-            call    next_flag
+            call    next_flag                       ; find format flag
 
             xor     bl, bl
-            xchg    byte [rdi], bl
+            xchg    byte [rdi], bl                  ; '%' <-> '0'
+                                                    ; (to make _put_s work)
+            mov     rsi, rax                        ; RSI = str block begin
+            call    _put_s                          ; print this block
+            mov     rdi, rsi                        ; RDI = RDI before puts
 
-            mov     rdi, rax
-            call    _put_s
+            xchg    byte [rdi], bl                  ; '0' <-> '%'
 
-            xchg    byte [rdi], bl
-
-            cmp     byte [rdi], 0
+            cmp     byte [rdi], 0                   ; if met '0', exit
             je      .exit
 
             inc     rdi
-            call    parse_flag
+            call    parse_flag                      ; parse current flag
 
-            cmp     byte [rdi], SHIELD_FLAG
-            jne     .next_arg
+            cmp     byte [rdi], SHIELD_FLAG         ; if printed one of the args,
+            jne     .next_arg                       ; prepare next arg
 
             inc     rdi
-            jmp     .printf_loop
+            jmp     .printf_loop                    ; loop to the next flag
 
 .next_arg:
             inc     rdi
             add     rbp, 8
             inc     r8
             cmp     r8, 5
-            jne     .printf_loop
-
-            add     rbp, 16
+            jne     .printf_loop                    ; if printed 5 args, skip
+                                                    ; old RBP and ret address
+            add     rbp, 16                         ; sof (old_RBP + @ret) = 8+8 = 16
             jmp     .printf_loop
 
 .exit:
-            add     rsp, 5*8
-            pop     rbp
+            call _flush_buffer                      ; flush symbols left in buffer
 
-            mov     rax, r8
+            add     rsp, 5*8
+            pop     rbp                             ; remove stack frame
+
+            mov     rax, r8                         ; return num of printed args
 
             ret
 
 
 ;;=========================================================================
-;; Flag finder
-;; Entry: rdi <- current cursor position
-;; Exit:  rdi <- next format pos after format flag
+;; Find next format flag
+;;
+;; ENTRY: RDI <- current cursor position
+;; EXIT:  RDI <- next format flag pos (marker is '%')
+;;               or string end
 ;;=========================================================================
 
 next_flag:
@@ -96,10 +122,11 @@ next_flag:
             ret
 
 ;;=========================================================================
-;; Flag parser
-;; Entry: rdi <- position where is flag
-;;        rbp <- argument position
-;; Destr: 
+;; Parse flag and print current argument according to flag
+;;
+;; ENTRY: RDI <- position where is flag
+;;        RBP <- address of current argument
+;; Destr: RAX RBX RCX RDX RSI ; DF
 ;;=========================================================================
 
 SHIELD_FLAG equ '%'
@@ -113,48 +140,39 @@ UINT_FLAG   equ 'u'
 DINT_FLAG   equ 'd'
 
 parse_flag:
-            push    rdi
-            cmp     byte [rdi], SHIELD_FLAG
-            je      .is_shield
+            push    rdi                             ; save current position
+
+            cmp     byte [rdi], SHIELD_FLAG         ; if shielded symbol
+            je      .is_shield                      ; (just print it)
             jmp     .is_flag
 
 .is_shield:
-            mov     rdi, procent
-            call    _put_s
+            mov     sil, SHIELD_FLAG
+            call    _put_c                          ; print shielded symbol
             jmp     .exit
 
 .is_flag:
-            xor     rcx, rcx
-            mov     al, byte [rdi]
-            mov     rdi, qword [rbp]
+            xor     rcx, rcx                        ; RCX - flag iterator
+            mov     al, byte [rdi]                  ; current flag
+            mov     rsi, qword [rbp]                ; current argument
 
-.find_suitable_func:
-            cmp     byte [int_flag_table+rcx], 0
-            je      .flag_error
+.find_suitable_flag:
 
-            cmp     al, byte [int_flag_table+rcx]
+            cmp     byte [int_flag_table+rcx], 0    ; found no flag with no such
+            je      .exit                           ; char value
+
+            cmp     al, byte [int_flag_table+rcx]   ; if found, print
             je      .call_suitable_func
 
-            inc     rcx
-            jmp     .find_suitable_func
+            inc     rcx                             ; loop to the next flag
+            jmp     .find_suitable_flag
 
 .call_suitable_func:
-            call    qword [put_int_table+8*rcx]
-            jmp     .exit
 
-.flag_error:
-            mov     rax, 1
-            mov     rdi, 1
-            mov     rsi, ErrMsg
-            mov     rdx, ErrMsgLen
-            syscall
-
-            mov     rax, 60
-            xor     rdi, rdi
-            syscall
+            call    qword [put_int_table+8*rcx]     ; print current arg
 
 .exit:
-            pop     rdi
+            pop     rdi                             ; restore current position
 
             ret
 
@@ -162,18 +180,12 @@ parse_flag:
 
             section .data
 
-procent:    db '%', 0
-
 int_flag_table:
             db UINT_FLAG, DINT_FLAG, BINT_FLAG, OINT_FLAG, XINT_FLAG
             db CHAR_FLAG, CSTR_FLAG,                                    0
 put_int_table:
             dq _put_u,    _put_d,    _put_b,    _put_o,    _put_x
             dq _put_c,    _put_s,                                       0
-
-
-ErrMsg:     db "Unknown flag! Terminate...", 10
-ErrMsgLen   equ $ - ErrMsg
 
 ;;=========================================================================
 

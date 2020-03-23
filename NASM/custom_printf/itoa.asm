@@ -9,17 +9,27 @@
             global  _itoa
 
 ;;=========================================================================
-;; Convert unsigned int number to string
-;; Entry: edi <- unsigned int number
-;;        rsi <- addr of string buffer
-;;         dh <- binary degree of base if binary, 0 if not
-;;         dl <- base (<=16)
-;; Exit:  rsi -> addr of the last written symbol
-;; Destr: rax rdx rdi r9
+;; Convert unsigned int number to string in base representation
+;;
+;; Danger! Writes from end to begin of the number
+;; So, RDI should point to the place where the number
+;; should end.
+;;
+;;                  v-RDI_entry
+;; buffer: _1_2_3_4_5_
+;;          ^-RDI_exit
+;;
+;; ENTRY: ESI <- unsigned int number
+;;        RDI <- addr of string buffer end
+;;         DH <- binary degree of base if binary, 0 if not
+;;         DL <- base (<= 16)
+;; Exit:  RDI -> addr of the last written digit
+;; Destr: RAX RBX RDX RSI ; DF
 ;;=========================================================================
 
 _itoa:
-            mov     r9, rsi
+            lea     rbx, [DIGITS]               ; RBX points to DIGITS arr
+            std                                 ; set dest. flag (R to L)
 
             mov     byte [BASE], dl             ; BASE = DL
             cmp     dh, 0                       ; !binary => ordinary_division
@@ -29,46 +39,41 @@ _itoa:
             mov     byte [SHIFT], dh            ; SHIFT = DH
 
 .binary_division:
-            xor     rdx, rdx
-            mov     edx, edi
-            and     edx, dword [BASE]           ; EDX = EDI % BASE
 
-            add     rdx, DIGITS                 ; RDX -> correct remainder digit
-            mov     al, byte [rdx]
-            mov     byte [rsi], al              ; correct digit -> output buffer
-            inc     rsi                         ; ++buf_ptr
+            xor     rax, rax                    ; RAX = 0
+            mov     eax, esi
+            and     eax, dword [BASE]           ; AL = ESI % BASE
 
-            xor     rdx, rdx
-            mov     dl, byte [SHIFT]
-.divide:    shr     edi, 1
-            dec     rdx
-            jnz     .divide
+            xlatb                               ; AL = [DIGITS + AL]
+            stosb                               ; [RDI++] = AL
 
-            cmp     edi, 0
-            jne     .binary_division
+            mov     al, byte [SHIFT]            ; AL = SHIFT
+.shr_loop:                                      ; loop: ESI <<= AL
+            shr     esi, 1
+            dec     rax
+            jnz     .shr_loop                   ; while (SHIFT--) EDI >> 1;
+
+            cmp     esi, 0
+            jne     .binary_division            ; if done, exit
             jmp     .exit
 
 .ordinary_division:
-            xor     rdx, rdx
-            mov     eax, edi
+            xor     edx, edx                    ; 0:ESI / BASE = EAX * BASE + EDX
+            mov     eax, esi
             div     dword [BASE]
 
-            mov     edi, eax
+            mov     esi, eax                    ; ESI <- QUOTIENT
+            mov     al, dl                      ; AL <- REMAINDER
 
-            add     rdx, DIGITS
-            mov     al, byte [rdx]
-            mov     byte [rsi], al
-            inc     rsi
+            xlatb                               ; AL = [DIGITS + AL]
+            stosb                               ; [RDI++] = AL
 
-            cmp     edi, 0
-            jne     .ordinary_division
+            cmp     esi, 0
+            jne     .ordinary_division          ; if done, exit
             jmp     .exit
 
 .exit:
-            mov     rdi, r9
-            dec     rsi
-
-            call    reverse
+            inc     rdi                         ; [RDI] == first digit
 
             ret
 
@@ -80,46 +85,3 @@ BASE:       dd 0
 DIGITS:     db "0123456789ABCDEF"
 
 ;;=========================================================================
-;; Reverse string
-;; Entry: rdi <- string begin
-;;        rsi <- string end   (pointer to the last symbol)
-;; Destr: rax rdx rdi
-;;=========================================================================
-
-reverse:
-            mov     rdx, rsi
-.loop:
-            cmp     rdi, rsi
-            jae     .exit
-
-            mov     al, byte [rdi]
-            xchg    al, byte [rsi]
-            mov     byte [rdi], al
-
-            inc     rdi
-            dec     rsi
-
-            jmp     .loop
-
-.exit:
-            mov     rsi, rdx
-            ret
-
-;;=========================================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
