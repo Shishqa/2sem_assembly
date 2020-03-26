@@ -18,7 +18,7 @@ Start:		mov 	bx, 09h
 
 		call 	HookInt			; hooking interrupt 09h
 
-		mov 	bx, 28d
+		mov 	bx, 28h
 		mov	si, offset Printer
 
 		call    HookInt

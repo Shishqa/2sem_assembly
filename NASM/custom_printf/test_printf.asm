@@ -13,6 +13,16 @@
 
 %endmacro
 
+%macro      multipop 2
+
+            %rep %2
+
+                pop %1
+
+            %endrep
+
+%endmacro
+
 %macro      invoke 1-*
 
         %if %0 > 1
@@ -52,6 +62,8 @@
         %endif
 
             call    %1
+
+            multipop rdi, %0 - 7
 
 %endmacro
 

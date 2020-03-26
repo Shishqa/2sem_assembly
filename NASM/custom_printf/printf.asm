@@ -2,16 +2,6 @@
 ;; printf.asm                                           Shishqa, MIPT 2020
 ;;=========================================================================
 
-%macro      multipop 2
-
-            %rep %2
-
-                pop %1
-
-            %endrep
-
-%endmacro
-
             global  printf
 
             extern  _put_s
@@ -158,10 +148,10 @@ parse_flag:
 
 .find_suitable_flag:
 
-            cmp     byte [int_flag_table+rcx], 0    ; found no flag with no such
+            cmp     byte [flag_table+rcx], 0        ; found no flag with no such
             je      .exit                           ; char value
 
-            cmp     al, byte [int_flag_table+rcx]   ; if found, print
+            cmp     al, byte [flag_table+rcx]       ; if found, print
             je      .call_suitable_func
 
             inc     rcx                             ; loop to the next flag
@@ -169,7 +159,7 @@ parse_flag:
 
 .call_suitable_func:
 
-            call    qword [put_int_table+8*rcx]     ; print current arg
+            call    qword [call_table+8*rcx]        ; print current arg
 
 .exit:
             pop     rdi                             ; restore current position
@@ -180,10 +170,11 @@ parse_flag:
 
             section .data
 
-int_flag_table:
+flag_table:
             db UINT_FLAG, DINT_FLAG, BINT_FLAG, OINT_FLAG, XINT_FLAG
             db CHAR_FLAG, CSTR_FLAG,                                    0
-put_int_table:
+
+call_table:
             dq _put_u,    _put_d,    _put_b,    _put_o,    _put_x
             dq _put_c,    _put_s,                                       0
 
