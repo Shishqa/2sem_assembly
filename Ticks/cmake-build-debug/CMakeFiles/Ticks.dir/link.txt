@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/Ticks.dir/main.c.o  -o Ticks 

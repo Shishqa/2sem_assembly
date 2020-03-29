@@ -1,3 +1,0 @@
-/home/shishqa/Repositories/MIPT/2_semester/Assembly/Ticks/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/shishqa/Repositories/MIPT/2_semester/Assembly/Ticks/cmake-build-debug/CMakeFiles/Ticks.dir
-/home/shishqa/Repositories/MIPT/2_semester/Assembly/Ticks/cmake-build-debug/CMakeFiles/edit_cache.dir

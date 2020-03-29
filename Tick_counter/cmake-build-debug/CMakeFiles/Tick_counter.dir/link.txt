@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/Tick_counter.dir/main.cpp.o  -o Tick_counter 
