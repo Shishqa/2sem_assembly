@@ -13,16 +13,6 @@
 
 %endmacro
 
-%macro      multipop 2
-
-            %rep %2
-
-                pop %1
-
-            %endrep
-
-%endmacro
-
 %macro      invoke 1-*
 
         %if %0 > 1
@@ -63,8 +53,6 @@
 
             call    %1
 
-            multipop rdi, %0 - 7
-
 %endmacro
 
 
@@ -78,9 +66,9 @@
 ;;=========================================================================
 
 _start:
-            invoke printf, format, qword CHAR_TEST, CSTR_TEST, qword DINT_TEST, qword UINT_TEST, qword BINT_TEST, qword OINT_TEST, qword XINT_TEST
+            invoke printf, format1, qword CHAR_TEST, CSTR_TEST, qword DINT_TEST, qword UINT_TEST, qword BINT_TEST, qword OINT_TEST, qword XINT_TEST
 
-            invoke printf, string2, lovestr, qword 3802, qword 100, qword '!', qword 127
+            invoke printf, format2, lovestr, qword 3802, qword 100, qword '!', qword 127, meowstr
 
             mov     rax, 60
             xor     rdi, rdi
@@ -100,10 +88,11 @@ BINT_TEST   equ 2121
 OINT_TEST   equ 9898
 XINT_TEST   equ 1024
 
-string2:    db 'I %s %x %d%%%c%b', 0xA, 0
+format2:    db 'I %s %x%d%%%c%b, %s!' , 0xA, 0
 lovestr:    db 'love', 0
+meowstr:    db 'meow', 0
 
-format:     db "Test formats:", 10
+format1:    db "Test formats:", 10
             db "%%c: %c", 9,9,9,9,  "(should be 'G')",      10
             db "%%s: %s",                                   10
             db "%%d: %d", 9,9,9,    "(should be -8625d)",   10

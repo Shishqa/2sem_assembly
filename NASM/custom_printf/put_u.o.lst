@@ -1,0 +1,75 @@
+     1                                  ;;=========================================================================
+     2                                  ;; put_u.asm                                            Shishqa, MIPT 2020
+     3                                  ;;=========================================================================
+     4                                  
+     5                                              global  _put_b
+     6                                              global  _put_o
+     7                                              global  _put_u
+     8                                              global  _put_x
+     9                                  
+    10                                              extern  _put_u_base
+    11                                  
+    12                                              section .text
+    13                                  
+    14                                  ;;=========================================================================
+    15                                  ;; Writes unsigned int in binary representation to the console
+    16                                  ;;
+    17                                  ;; ENTRY: ESI <- int number to print
+    18                                  ;; DESTR: RAX RBX RDX RSI RDI ; DF
+    19                                  ;;=========================================================================
+    20                                  
+    21                                  _put_b:
+    22 00000000 66BA0201                            mov     dx, (1 << 8) | 2        ; DL = 2, DH = 1 (BASE = 2^1)
+    23 00000004 E8(00000000)                        call    _put_u_base
+    24                                  
+    25 00000009 C3                                  ret
+    26                                  
+    27                                  ;;=========================================================================
+    28                                  ;; Writes unsigned int in decimal representation to the console
+    29                                  ;;
+    30                                  ;; Entry: ESI <- int number to print
+    31                                  ;; Destr: RAX RBX RDX RSI RDI ; DF
+    32                                  ;;=========================================================================
+    33                                  
+    34                                  _put_u:
+    35 0000000A 66BA0A00                            mov     dx, (0 << 8) | 10       ; DL = 10, DH = 0 (BASE = 10)
+    36 0000000E E8(00000000)                        call    _put_u_base
+    37                                  
+    38 00000013 C3                                  ret
+    39                                  
+    40                                  ;;=========================================================================
+    41                                  ;; Writes unsigned int in octal representation to the console
+    42                                  ;;
+    43                                  ;; ENTRY: ESI <- int number to print
+    44                                  ;; Destr: RAX RBX RDX RSI RDI ; DF
+    45                                  ;;=========================================================================
+    46                                  
+    47                                  _put_o:
+    48 00000014 66BA0803                            mov     dx, (3 << 8) | 8        ; DL = 8, DH = 3 (BASE = 2^3)
+    49 00000018 E8(00000000)                        call    _put_u_base
+    50                                  
+    51 0000001D C3                                  ret
+    52                                  
+    53                                  ;;=========================================================================
+    54                                  ;; Writes unsigned int in hexadecimal representation to the console
+    55                                  ;;
+    56                                  ;; ENTRY: ESI <- int number to print
+    57                                  ;; DESTR: RAX RBX RDX RSI RDI ; DF
+    58                                  ;;=========================================================================
+    59                                  
+    60                                  _put_x:
+    61 0000001E 66BA1004                            mov     dx, (4 << 8) | 16       ; DL = 16, DH = 4 (BASE = 2^4)
+    62 00000022 E8(00000000)                        call    _put_u_base
+    63                                  
+    64 00000027 C3                                  ret
+    65                                  
+    66                                  ;;=========================================================================
+    67                                  
+    68                                  
+    69                                  
+    70                                  
+    71                                  
+    72                                  
+    73                                  
+    74                                  
+    75                                  

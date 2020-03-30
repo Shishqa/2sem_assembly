@@ -29,6 +29,7 @@
             global  _put_s
             global  _put_c
             global  _flush_buffer
+            global  _set_buffer
 
 ;;=========================================================================
 ;; Writes string to the console
@@ -57,6 +58,7 @@ _put_s:
             jmp     .print_loop
 
 .exit:
+
             ret
 
 ;;=========================================================================
@@ -79,6 +81,16 @@ _put_c:
             ret
 
 ;;=========================================================================
+
+_set_buffer:
+
+            mov     qword [BufBegin], 0
+            mov     qword [BufEnd], 0
+
+            ret
+
+
+;;=========================================================================
 ;; Frees output buffer
 ;;
 ;; DESTR: RAX RDI
@@ -99,8 +111,9 @@ _flush_buffer:
             mov     rdi, 1
             lea     rsi, [Buffer]
             add     rsi, qword [BufBegin]
-            mov     rdx, qword [BufEnd]
-            sub     rdx, qword [BufBegin]       ; len = BufEnd - BufBegin
+            xor     rdx, rdx
+            mov     dl, byte [BufEnd]
+            sub     dl, byte [BufBegin]       ; len = BufEnd - BufBegin
             syscall
 
             jmp     .exit
@@ -132,7 +145,7 @@ _flush_buffer:
 
             section .data
 
-BufSize     equ 256
+BufSize     equ 512
 
 BufBegin:   dq 0
 BufEnd:     dq 0

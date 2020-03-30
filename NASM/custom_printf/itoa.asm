@@ -58,6 +58,7 @@ _itoa:
             jmp     .exit
 
 .ordinary_division:
+
             xor     edx, edx                    ; 0:ESI / BASE = EAX * BASE + EDX
             mov     eax, esi
             div     dword [BASE]

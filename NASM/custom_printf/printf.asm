@@ -2,6 +2,17 @@
 ;; printf.asm                                           Shishqa, MIPT 2020
 ;;=========================================================================
 
+%macro      multipop 1-*
+
+            %rep %0
+
+                pop %1
+
+            %rotate 1
+            %endrep
+
+%endmacro
+
             global  printf
 
             extern  _put_s
@@ -13,6 +24,7 @@
             extern  _put_d
 
             extern  _flush_buffer
+            extern  _set_buffer
 
             section .text
 
@@ -22,29 +34,34 @@
 ;; supports: %d %u %b %o %x %c %s %%
 ;;
 ;; ENTRY: RDI <- format string address (null terminated)
-;;        RSI <- 1st arg
-;;        ...
-;;   <stdcall seq>
-;;        ...
-;;         R9 <- 5th arg
-;;      STACK <- other args from right to left
+;;
+;;        {RSI RDX RCX R8 R9} <- {1-5th args from left to right}
+;;
+;;        STACK <- other args from right to left (6th on the top)
+;;
 ;; DESTR: RAX RBX RCX RDX RSI RDI R8 ; DF
 ;;=========================================================================
 
 printf:
-            push    rbp
-            mov     rbp, rsp
-            sub     rsp, 5*8                        ; init stack frame
+            pop     rax                             ; ret addr -> RAX
 
-            mov     qword [rbp-5*8], rsi
-            mov     qword [rbp-4*8], rdx
-            mov     qword [rbp-3*8], rcx
-            mov     qword [rbp-2*8], r8
-            mov     qword [rbp-1*8], r9             ; load args to memory
+            push    r9
+            push    r8
+            push    rcx                             ; push args passed
+            push    rdx                             ; by registers to
+            push    rsi                             ; stack
 
-            xor     r8, r8                          ; R8 - arg counter
+            push    rax                             ; push ret addr(RAX)
 
-            sub     rbp, 5*8                        ; RBP -> first arg
+            push    rbp                             ; save old RBP
+            mov     rbp, rsp                        ; 
+            add     rbp, 16                         ; RBP -> 1st arg 
+
+            call    _set_buffer                     ; align buf ptrs
+
+            push    rbx                             ; save RBX
+
+            xor     r10, r10
 
 .printf_loop:
 
@@ -65,33 +82,30 @@ printf:
 
             inc     rdi
             call    parse_flag                      ; parse current flag
-
-            cmp     byte [rdi], SHIELD_FLAG         ; if printed one of the args,
-            jne     .next_arg                       ; prepare next arg
-
             inc     rdi
-            jmp     .printf_loop                    ; loop to the next flag
 
-.next_arg:
-            inc     rdi
-            add     rbp, 8
-            inc     r8
-            cmp     r8, 5
-            jne     .printf_loop                    ; if printed 5 args, skip
-                                                    ; old RBP and ret address
-            add     rbp, 16                         ; sof (old_RBP + @ret) = 8+8 = 16
+            cmp     byte [rdi-1], SHIELD_FLAG       ; if printed one of the args,
+            je      .printf_loop                    ; prepare next arg
+
+            add     rbp, 8                          ; RBP -> next arg
+            inc     r10
             jmp     .printf_loop
 
 .exit:
-            call _flush_buffer                      ; flush symbols left in buffer
+            pop     rbx                             ; restore RBX
+            pop     rbp                             ; restore RBP
 
-            add     rsp, 5*8
-            pop     rbp                             ; remove stack frame
+            call    _flush_buffer
 
-            mov     rax, r8                         ; return num of printed args
+            pop     rdi
+
+            multipop rax, rax, rax, rax, rax
+
+            push    rdi
+
+            mov     rax, r10
 
             ret
-
 
 ;;=========================================================================
 ;; Find next format flag
@@ -142,22 +156,22 @@ parse_flag:
             jmp     .exit
 
 .is_flag:
-            xor     rcx, rcx                        ; RCX - flag iterator
+            xor     rcx, rcx
+            mov     rcx, 7                        ; RCX - flag iterator
+
             mov     al, byte [rdi]                  ; current flag
             mov     rsi, qword [rbp]                ; current argument
+            mov     rdi, flag_table
 
-.find_suitable_flag:
-
-            cmp     byte [flag_table+rcx], 0        ; found no flag with no such
-            je      .exit                           ; char value
-
-            cmp     al, byte [flag_table+rcx]       ; if found, print
-            je      .call_suitable_func
-
-            inc     rcx                             ; loop to the next flag
-            jmp     .find_suitable_flag
+            cld
+            repne   scasb 
+            jne     .exit
 
 .call_suitable_func:
+
+            mov     rdi, rcx
+            mov     rcx, 6
+            sub     rcx, rdi
 
             call    qword [call_table+8*rcx]        ; print current arg
 

@@ -34,7 +34,7 @@ test_put_s: put_chars.o test_put_s.o
 	ld -o $@ $^
 
 %.o: %.asm
-	nasm ${NASM_FLAGS} -o $@ $<
+	nasm ${NASM_FLAGS} -l $@.lst -o $@ $<
 
 clean:
 	rm *.o

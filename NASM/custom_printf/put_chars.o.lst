@@ -1,0 +1,189 @@
+     1                                  ;;=========================================================================
+     2                                  ;;                                                         (c)Shishqa,2020
+     3                                  ;;=========================================================================
+     4                                  
+     5                                  %macro      store_char 0
+     6                                  
+     7                                              lea     rdi, [Buffer]
+     8                                              add     rdi, qword [BufEnd]         ; RDI points to buffer end
+     9                                              stosb                               ; write new char to buffer
+    10                                              inc     byte [BufEnd]               ; BufEnd++
+    11                                  
+    12                                  %endmacro
+    13                                  
+    14                                  
+    15                                  %macro      check_buf_overflow 0
+    16                                  
+    17                                              mov     al, byte [BufEnd]
+    18                                              cmp     al, byte [BufBegin]         ; if BufBegin == BufEnd,
+    19                                              jne     %%do_not_flush              ; the buffer is full
+    20                                                                                  ; so, we need to flush it
+    21                                              call    _flush_buffer               ; to the stdout
+    22                                  
+    23                                      %%do_not_flush:
+    24                                  
+    25                                  %endmacro
+    26                                  
+    27                                              section .text
+    28                                  
+    29                                              global  _put_s
+    30                                              global  _put_c
+    31                                              global  _flush_buffer
+    32                                              global  _set_buffer
+    33                                  
+    34                                  ;;=========================================================================
+    35                                  ;; Writes string to the console
+    36                                  ;;
+    37                                  ;; The output is buffered, so string
+    38                                  ;; will not appear immediately !
+    39                                  ;;
+    40                                  ;; ENTRY: RSI <- string address
+    41                                  ;; DESTR: RAX RDI
+    42                                  ;;=========================================================================
+    43                                  
+    44                                  _put_s:
+    45                                  
+    46                                  .print_loop:
+    47                                  
+    48 00000000 8A06                                mov     al, byte [rsi]
+    49                                  
+    50 00000002 3C00                                cmp     al, 0                       ; if AL == 0, the null str
+    51 00000004 7432                                je      .exit                       ; terminal is reached -> exit
+    52                                  
+    53                                              store_char                          ; [Buffer + BufEnd++] = AL
+    53                              <1> 
+    53 00000006 488D3C25[10000000]  <1>  lea rdi, [Buffer]
+    53 0000000E 48033C25[08000000]  <1>  add rdi, qword [BufEnd]
+    53 00000016 AA                  <1>  stosb
+    53 00000017 FE0425[08000000]    <1>  inc byte [BufEnd]
+    53                              <1> 
+    54                                  
+    55                                              check_buf_overflow                  ; flush buff if need
+    55                              <1> 
+    55 0000001E 8A0425[08000000]    <1>  mov al, byte [BufEnd]
+    55 00000025 3A0425[00000000]    <1>  cmp al, byte [BufBegin]
+    55 0000002C 7505                <1>  jne %%do_not_flush
+    55                              <1> 
+    55 0000002E E850000000          <1>  call _flush_buffer
+    55                              <1> 
+    55                              <1>  %%do_not_flush:
+    55                              <1> 
+    56                                  
+    57 00000033 48FFC6                              inc     rsi                         ; loop to the next symbol
+    58 00000036 EBC8                                jmp     .print_loop
+    59                                  
+    60                                  .exit:
+    61                                  
+    62 00000038 C3                                  ret
+    63                                  
+    64                                  ;;=========================================================================
+    65                                  ;; Writes char symbol to the console
+    66                                  ;;
+    67                                  ;; The output is buffered, so symbol
+    68                                  ;; will not appear immediately !
+    69                                  ;;
+    70                                  ;; Entry: SIL <- char value
+    71                                  ;; Destr: RAX RDI
+    72                                  ;;=========================================================================
+    73                                  
+    74                                  _put_c:
+    75 00000039 4088F0                              mov     al, sil
+    76                                  
+    77                                              store_char                          ; [Buffer + BufEnd++] = AL
+    77                              <1> 
+    77 0000003C 488D3C25[10000000]  <1>  lea rdi, [Buffer]
+    77 00000044 48033C25[08000000]  <1>  add rdi, qword [BufEnd]
+    77 0000004C AA                  <1>  stosb
+    77 0000004D FE0425[08000000]    <1>  inc byte [BufEnd]
+    77                              <1> 
+    78                                  
+    79                                              check_buf_overflow                  ; flush buff if need
+    79                              <1> 
+    79 00000054 8A0425[08000000]    <1>  mov al, byte [BufEnd]
+    79 0000005B 3A0425[00000000]    <1>  cmp al, byte [BufBegin]
+    79 00000062 7505                <1>  jne %%do_not_flush
+    79                              <1> 
+    79 00000064 E81A000000          <1>  call _flush_buffer
+    79                              <1> 
+    79                              <1>  %%do_not_flush:
+    79                              <1> 
+    80                                  
+    81 00000069 C3                                  ret
+    82                                  
+    83                                  ;;=========================================================================
+    84                                  
+    85                                  _set_buffer:
+    86                                  
+    87 0000006A 48C70425[00000000]-                 mov     qword [BufBegin], 0
+    87 00000072 00000000           
+    88 00000076 48C70425[08000000]-                 mov     qword [BufEnd], 0
+    88 0000007E 00000000           
+    89                                  
+    90 00000082 C3                                  ret
+    91                                  
+    92                                  
+    93                                  ;;=========================================================================
+    94                                  ;; Frees output buffer
+    95                                  ;;
+    96                                  ;; DESTR: RAX RDI
+    97                                  ;;=========================================================================
+    98                                  
+    99                                  _flush_buffer:
+   100                                  
+   101 00000083 56                                  push    rsi
+   102 00000084 52                                  push    rdx                         ; save RSI RDX
+   103                                  
+   104 00000085 488B3C25[00000000]                  mov     rdi, qword [BufBegin]       ; |def_____abc| - 2 blocks
+   105 0000008D 483B3C25[08000000]                  cmp     rdi, qword [BufEnd]         ; |__abc______| - 1 block
+   106 00000095 772F                                ja      .two_blocks
+   107                                  
+   108                                  .single_block:
+   109                                  
+   110 00000097 B801000000                          mov     rax, 1                      ; print single block
+   111 0000009C BF01000000                          mov     rdi, 1
+   112 000000A1 488D3425[10000000]                  lea     rsi, [Buffer]
+   113 000000A9 48033425[00000000]                  add     rsi, qword [BufBegin]
+   114 000000B1 4831D2                              xor     rdx, rdx
+   115 000000B4 8A1425[08000000]                    mov     dl, byte [BufEnd]
+   116 000000BB 2A1425[00000000]                    sub     dl, byte [BufBegin]       ; len = BufEnd - BufBegin
+   117 000000C2 0F05                                syscall
+   118                                  
+   119 000000C4 EB3B                                jmp     .exit
+   120                                  
+   121                                  .two_blocks:
+   122                                  
+   123 000000C6 B801000000                          mov     rax, 1                      ; print first block
+   124 000000CB BF01000000                          mov     rdi, 1
+   125 000000D0 488D3425[10000000]                  lea     rsi, [Buffer]
+   126 000000D8 48033425[00000000]                  add     rsi, qword [BufBegin]
+   127 000000E0 BA00020000                          mov     rdx, BufSize
+   128 000000E5 482B1425[00000000]                  sub     rdx, qword [BufBegin]       ; len = BufSize - BufBegin
+   129 000000ED 0F05                                syscall
+   130                                  
+   131 000000EF 488D3425[10000000]                  lea     rsi, [Buffer]
+   132 000000F7 488B1425[08000000]                  mov     rdx, qword [BufEnd]         ; len = BufEnd - 0
+   133 000000FF 0F05                                syscall
+   134                                  
+   135                                  .exit:
+   136 00000101 8A0425[08000000]                    mov     al, byte [BufEnd]
+   137 00000108 880425[00000000]                    mov     byte [BufBegin], al         ; BufBegin = BufEnd
+   138                                  
+   139 0000010F 5A                                  pop     rdx
+   140 00000110 5E                                  pop     rsi                         ; restore RDX RSI
+   141                                  
+   142 00000111 C3                                  ret
+   143                                  
+   144                                  ;;-------------------------------------------------------------------------
+   145                                  
+   146                                              section .data
+   147                                  
+   148                                  BufSize     equ 512
+   149                                  
+   150 00000000 0000000000000000        BufBegin:   dq 0
+   151 00000008 0000000000000000        BufEnd:     dq 0
+   152                                  
+   153 00000010 00<rept>                Buffer:     times BufSize db 0
+   154                                  
+   155                                  ;;=========================================================================
+   156                                  
+   157                                  
