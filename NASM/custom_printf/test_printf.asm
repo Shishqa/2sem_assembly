@@ -66,9 +66,12 @@
 ;;=========================================================================
 
 _start:
-            invoke printf, format1, qword CHAR_TEST, CSTR_TEST, qword DINT_TEST, qword UINT_TEST, qword BINT_TEST, qword OINT_TEST, qword XINT_TEST
+            ;invoke printf, format1, qword CHAR_TEST, CSTR_TEST, qword DINT_TEST, qword UINT_TEST, qword BINT_TEST, qword OINT_TEST, qword XINT_TEST
 
-            invoke printf, format2, lovestr, qword 3802, qword 100, qword '!', qword 127, meowstr
+            ;invoke printf, format2, lovestr, qword 3802, qword 100, qword '!', qword 127, meowstr
+
+
+            invoke printf, frmt, rsp, rsp
 
             mov     rax, 60
             xor     rdi, rdi
@@ -77,6 +80,8 @@ _start:
 ;;-------------------------------------------------------------------------
 
             section .data
+
+frmt:       db "[gs:30] = %x and [gs:30] = %x", 10, 0
 
 CHAR_TEST   equ 'G'
 
