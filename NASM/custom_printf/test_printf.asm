@@ -68,10 +68,10 @@
 _start:
             ;invoke printf, format1, qword CHAR_TEST, CSTR_TEST, qword DINT_TEST, qword UINT_TEST, qword BINT_TEST, qword OINT_TEST, qword XINT_TEST
 
-            ;invoke printf, format2, lovestr, qword 3802, qword 100, qword '!', qword 127, meowstr
+            invoke printf, format2, lovestr, qword 3802, qword 10000000, qword '!', qword 127, qword 101, meowstr
 
 
-            invoke printf, frmt, rsp, rsp
+;            invoke printf, frmt, rsp, rsp
 
             mov     rax, 60
             xor     rdi, rdi
@@ -93,7 +93,7 @@ BINT_TEST   equ 2121
 OINT_TEST   equ 9898
 XINT_TEST   equ 1024
 
-format2:    db 'I %s %x%d%%%c%b, %s!' , 0xA, 0
+format2:    db 'I %s %x%d%%%c%b, %d %s!' , 0xA, 0
 lovestr:    db 'love', 0
 meowstr:    db 'meow', 0
 

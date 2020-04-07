@@ -1,11 +1,19 @@
+all: macos_security_check clean
 
-all: test_get clean
-
-test_get: test_get.o get_string.o check_password.o
+macos_security_check: test.o get_string.o check_password.o Murmurhash64B.o
 	ld -o $@ $^
 
-%.o: %.asm
-	nasm -felf64 -l $@.lst -o $@ $<
+test.o: test.asm
+	nasm -felf64 test.asm
+
+check_password.o: check_password.asm
+	nasm -felf64 check_password.asm
+
+get_string.o: get_string.asm
+	nasm -felf64 get_string.asm
+
+Murmurhash64B.o: Murmurhash64B.c
+	gcc -Wall -c Murmurhash64B.c
 
 clean:
 	rm *.o

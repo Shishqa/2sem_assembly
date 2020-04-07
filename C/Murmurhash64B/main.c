@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 
 typedef unsigned long long uint64_t;
@@ -56,10 +55,8 @@ uint64_t MurmurHash64B ( const void * key, int len, unsigned int seed )
 
 int main () {
 
-    char* str = "hello!";
+    char str[256] = "qwerty\n";
 
-    printf ("%u", MurmurHash64B(str, 6, 123));
-
-    return 0;
+    printf ("%llX", MurmurHash64B(str, 256, 0xffaabbcc));
 
 }

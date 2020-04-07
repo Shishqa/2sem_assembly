@@ -157,7 +157,7 @@ parse_flag:
 
 .is_flag:
             xor     rcx, rcx
-            mov     rcx, 7                        ; RCX - flag iterator
+            mov     rcx, 7                          ; RCX - flag iterator
 
             mov     al, byte [rdi]                  ; current flag
             mov     rsi, qword [rbp]                ; current argument
