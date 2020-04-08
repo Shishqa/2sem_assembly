@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/main.cpp
+cstdio
+-
+utility
+-
+stdexcept
+-
+
