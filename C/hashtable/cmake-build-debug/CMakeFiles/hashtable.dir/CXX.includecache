@@ -6,11 +6,19 @@
 
 #IncludeRegexTransform: 
 
-/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/main.cpp
+/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/HashTable.h
 cstdio
 -
 utility
 -
 stdexcept
+-
+
+/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/main.cpp
+HashTable.h
+/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/HashTable.h
+cstdio
+-
+string
 -
 

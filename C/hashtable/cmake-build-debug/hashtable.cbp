@@ -82,9 +82,6 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/HashTable.cpp">
-			<Option target="hashtable"/>
-		</Unit>
 		<Unit filename="/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/HashTable.h">
 			<Option target="hashtable"/>
 		</Unit>

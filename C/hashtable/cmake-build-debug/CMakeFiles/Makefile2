@@ -74,12 +74,12 @@ preinstall:
 CMakeFiles/hashtable.dir/all:
 	$(MAKE) -f CMakeFiles/hashtable.dir/build.make CMakeFiles/hashtable.dir/depend
 	$(MAKE) -f CMakeFiles/hashtable.dir/build.make CMakeFiles/hashtable.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/cmake-build-debug/CMakeFiles --progress-num=1,2,3 "Built target hashtable"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target hashtable"
 .PHONY : CMakeFiles/hashtable.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/hashtable.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/cmake-build-debug/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/cmake-build-debug/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/hashtable.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/hashtable.dir/rule
