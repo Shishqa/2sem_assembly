@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/HashTable.h
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable.h
 cstdio
 -
 utility
@@ -14,11 +14,15 @@ utility
 stdexcept
 -
 
-/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/main.cpp
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/main.cpp
 HashTable.h
-/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/hashtable/HashTable.h
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable.h
 cstdio
 -
 string
+-
+vector
+-
+fstream
 -
 
