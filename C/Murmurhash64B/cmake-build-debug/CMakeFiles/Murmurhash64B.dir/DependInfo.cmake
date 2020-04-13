@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/Murmurhash64B/main.c" "/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/Murmurhash64B/cmake-build-debug/CMakeFiles/Murmurhash64B.dir/main.c.o"
+  "/home/shishqa/Repositories/MIPT/2020_2/asm/C/Murmurhash64B/main.c" "/home/shishqa/Repositories/MIPT/2020_2/asm/C/Murmurhash64B/cmake-build-debug/CMakeFiles/Murmurhash64B.dir/main.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

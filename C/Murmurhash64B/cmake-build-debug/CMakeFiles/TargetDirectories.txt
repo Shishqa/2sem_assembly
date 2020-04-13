@@ -1,3 +1,3 @@
-/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/Murmurhash64B/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/Murmurhash64B/cmake-build-debug/CMakeFiles/Murmurhash64B.dir
-/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/Murmurhash64B/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/shishqa/Repositories/MIPT/2020_2/asm/C/Murmurhash64B/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/shishqa/Repositories/MIPT/2020_2/asm/C/Murmurhash64B/cmake-build-debug/CMakeFiles/Murmurhash64B.dir
+/home/shishqa/Repositories/MIPT/2020_2/asm/C/Murmurhash64B/cmake-build-debug/CMakeFiles/edit_cache.dir

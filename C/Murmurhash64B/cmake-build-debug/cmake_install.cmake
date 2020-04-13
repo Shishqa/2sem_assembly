@@ -1,4 +1,4 @@
-# Install script for directory: /home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/Murmurhash64B
+# Install script for directory: /home/shishqa/Repositories/MIPT/2020_2/asm/C/Murmurhash64B
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/shishqa/Repositories/MIPT/2-semester/Assembly_Dedinskiy/C/Murmurhash64B/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/shishqa/Repositories/MIPT/2020_2/asm/C/Murmurhash64B/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
