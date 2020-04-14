@@ -1,9 +1,11 @@
 #include "HashTable.h"
 
+#include <unordered_map>
+
 #include <cstdio>
 #include <string>
 #include <vector>
-#include <fstream>
+#include <iostream>
 
 const uint32_t MOD = 991;
 
@@ -16,42 +18,37 @@ uint32_t murmur_hash(const std::string& str);
 void MurmurHash3_x86_32 ( const void * key, int len,
                           uint32_t seed, void * out );
 
+class Hasher {
+public:
+    unsigned long long operator()(const int& key) const {
+        return key * 33;
+    }
+};
+
+class Equal {
+public:
+    bool operator()(const int& key1, const int& key2) const {
+        return key1 == key2;
+    }
+};
+
 int main() {
 
-    HashTable<std::string, size_t, id_hash, MOD> id_h_tab;
-    HashTable<std::string, size_t, len_hash, MOD> len_h_tab;
-    HashTable<std::string, size_t, ascii_hash, MOD> ascii_h_tab;
-    HashTable<std::string, size_t, simple_hash, MOD> simple_h_tab;
-    HashTable<std::string, size_t, murmur_hash, MOD> murmur_h_tab;
+    HashTable<int, int, Hasher, Equal> table;
 
-    std::string current_word;
-    std::ifstream fin("text.txt");
+    for (size_t i = 0; i < 100000; ++i) {
 
-    while (fin >> current_word) {
-
-        if (isalpha(current_word[0])) {
-
-            ++id_h_tab[current_word];
-            ++len_h_tab[current_word];
-            ++ascii_h_tab[current_word];
-            ++simple_h_tab[current_word];
-            ++murmur_h_tab[current_word];
-
-        }
+        table.insert({static_cast<int>(i), 1});
 
     }
 
-    fin.close();
+    for (size_t i = 0; i < 10000; ++i) {
 
-    FILE* out_fd = fopen("out.csv", "w");
+        printf("%d\n", *table.find(i));
 
-    id_h_tab.traverse(out_fd);
-    len_h_tab.traverse(out_fd);
-    ascii_h_tab.traverse(out_fd);
-    simple_h_tab.traverse(out_fd);
-    murmur_h_tab.traverse(out_fd);
+    }
 
-    fclose(out_fd);
+    std::cout << table[13] << "\n\n\n\n";
 
     return 0;
 }
@@ -83,7 +80,7 @@ uint32_t simple_hash(const std::string& str) {
     uint32_t hash = 0;
 
     for (auto c : str) {
-        hash ^= static_cast<uint32_t>(0x72896521);
+        hash ^= static_cast<uint32_t>(3001);
         hash += c;
     }
 
@@ -94,7 +91,7 @@ uint32_t murmur_hash(const std::string& str) {
 
     uint32_t hash = 0;
 
-    MurmurHash3_x86_32(str.c_str(), str.length(), 0x123317, &hash);
+    MurmurHash3_x86_32(str.c_str(), str.length(), 3001, &hash);
 
     return hash;
 }

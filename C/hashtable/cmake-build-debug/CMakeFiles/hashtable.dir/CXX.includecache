@@ -6,7 +6,21 @@
 
 #IncludeRegexTransform: 
 
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/Bucket_methods.h
+cstdio
+-
+HashTable_methods.h
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_methods.h
+
 C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable.h
+HashTable_class.h
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_class.h
+HashTable_methods.h
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_methods.h
+Bucket_methods.h
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/Bucket_methods.h
+
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_class.h
 cstdio
 -
 utility
@@ -14,15 +28,21 @@ utility
 stdexcept
 -
 
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_methods.h
+HashTable_class.h
+C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_class.h
+
 C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/main.cpp
 HashTable.h
 C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable.h
+unordered_map
+-
 cstdio
 -
 string
 -
 vector
 -
-fstream
+iostream
 -
 

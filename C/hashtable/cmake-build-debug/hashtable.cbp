@@ -80,7 +80,19 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/Bucket_methods.h">
+			<Option target="hashtable"/>
+		</Unit>
 		<Unit filename="C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable.h">
+			<Option target="hashtable"/>
+		</Unit>
+		<Unit filename="C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_class.h">
+			<Option target="hashtable"/>
+		</Unit>
+		<Unit filename="C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_iterator.h">
+			<Option target="hashtable"/>
+		</Unit>
+		<Unit filename="C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/HashTable_methods.h">
 			<Option target="hashtable"/>
 		</Unit>
 		<Unit filename="C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/main.cpp">

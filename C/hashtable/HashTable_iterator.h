@@ -1,0 +1,8 @@
+//
+// Created by shishatskiy on 14.04.2020.
+//
+
+#ifndef HASHTABLE_HASHTABLE_ITERATOR_H
+#define HASHTABLE_HASHTABLE_ITERATOR_H
+
+#endif //HASHTABLE_HASHTABLE_ITERATOR_H
