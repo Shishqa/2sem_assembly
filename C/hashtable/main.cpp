@@ -18,6 +18,8 @@ void MurmurHash3_x86_32 ( const void * key, int len,
 
 int main() {
 
+    //TODO: hash func array && update hashfunc method
+
     HashTable<std::string, size_t, id_hash, MOD> id_h_tab;
     HashTable<std::string, size_t, len_hash, MOD> len_h_tab;
     HashTable<std::string, size_t, ascii_hash, MOD> ascii_h_tab;

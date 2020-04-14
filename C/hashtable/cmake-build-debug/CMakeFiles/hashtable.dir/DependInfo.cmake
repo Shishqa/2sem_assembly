@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/main.cpp" "C:/Users/shishatskiy/Desktop/Repository/MIPT/2_semester/Assembly_Dedinskiy/C/hashtable/cmake-build-debug/CMakeFiles/hashtable.dir/main.cpp.obj"
+  "/home/shishqa/repositories/MIPT/2020_2/asm/C/hashtable/main.cpp" "/home/shishqa/repositories/MIPT/2020_2/asm/C/hashtable/cmake-build-debug/CMakeFiles/hashtable.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
