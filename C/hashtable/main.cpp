@@ -2,175 +2,118 @@
 
 #include <cstdio>
 #include <string>
-#include <vector>
 #include <fstream>
+#include <iostream>
 
-const uint32_t MOD = 991;
+uint64_t MurmurHash64B (const void * key, int len, unsigned int seed);
 
-uint32_t id_hash(const std::string& str);
-uint32_t len_hash(const std::string& str);
-uint32_t ascii_hash(const std::string& str);
-uint32_t simple_hash(const std::string& str);
-uint32_t murmur_hash(const std::string& str);
+class StrHasher {
 
-void MurmurHash3_x86_32 ( const void * key, int len,
-                          uint32_t seed, void * out );
+    static const unsigned int BASIC_SEED = 0xAB63F3;
+
+public:
+    unsigned long long operator()(const std::string& key) const {
+        return MurmurHash64B(key.c_str(), key.length(), BASIC_SEED);
+    }
+};
+
+class StrEqual {
+public:
+    bool operator()(const std::string& key1, const std::string& key2) const {
+        return key1 == key2;
+    }
+};
 
 int main() {
 
-    //TODO: hash func array && update hashfunc method
+    const size_t BUCKET_COUNT = 0x7FFFF;
 
-    HashTable<std::string, size_t, id_hash, MOD> id_h_tab;
-    HashTable<std::string, size_t, len_hash, MOD> len_h_tab;
-    HashTable<std::string, size_t, ascii_hash, MOD> ascii_h_tab;
-    HashTable<std::string, size_t, simple_hash, MOD> simple_h_tab;
-    HashTable<std::string, size_t, murmur_hash, MOD> murmur_h_tab;
+    HashTable<std::string, size_t, StrHasher, StrEqual> table(BUCKET_COUNT);
 
-    std::string current_word;
     std::ifstream fin("text.txt");
 
-    while (fin >> current_word) {
+    std::string str;
 
-        if (isalpha(current_word[0])) {
+    while (fin >> str) {
 
-            ++id_h_tab[current_word];
-            ++len_h_tab[current_word];
-            ++ascii_h_tab[current_word];
-            ++simple_h_tab[current_word];
-            ++murmur_h_tab[current_word];
-
+        if (isalpha(str[0])) {
+            table[str]++;
         }
 
     }
 
     fin.close();
 
-    FILE* out_fd = fopen("out.csv", "w");
+    const size_t NUM_VARIANTS = 10;
+    
+    std::string arr_requests[NUM_VARIANTS] = {  "a", 
+                                                "aa", 
+                                                "aaa", 
+                                                "aaaa"
+                                                "aaaaa", 
+                                                "aaaaaa", 
+                                                "aaaaaaa", 
+                                                "aaaaaaaa", 
+                                                "aaaaaaaaa", 
+                                                "aaaaaaaaaa" };
 
-    id_h_tab.traverse(out_fd);
-    len_h_tab.traverse(out_fd);
-    ascii_h_tab.traverse(out_fd);
-    simple_h_tab.traverse(out_fd);
-    murmur_h_tab.traverse(out_fd);
+    for (size_t i = 0; i < 10000000; ++i) {
 
-    fclose(out_fd);
+        table.find(arr_requests[i % NUM_VARIANTS]);
+
+    }
 
     return 0;
 }
 
-uint32_t id_hash(const std::string& str) {
+uint64_t MurmurHash64B(const void * key, int len, unsigned int seed) {
 
-    return str[0];
-}
+    const unsigned int m = 0x5bd1e995;
+    const int r = 24;
 
-uint32_t len_hash(const std::string& str) {
+    unsigned int h1 = seed ^ len;
+    unsigned int h2 = 0;
 
-    return str.length();
-}
+    const unsigned int * data = (const unsigned int *)key;
 
-uint32_t ascii_hash(const std::string& str) {
+    while(len >= 8) {
 
-    uint32_t hash = 0;
+        unsigned int k1 = *data++;
+        k1 *= m; k1 ^= k1 >> r; k1 *= m;
+        h1 *= m; h1 ^= k1;
+        len -= 4;
 
-    for (auto c : str) {
-
-        hash += c;
+        unsigned int k2 = *data++;
+        k2 *= m; k2 ^= k2 >> r; k2 *= m;
+        h2 *= m; h2 ^= k2;
+        len -= 4;
     }
 
-    return hash / str.length();
-}
+    if(len >= 4) {
 
-uint32_t simple_hash(const std::string& str) {
-
-    uint32_t hash = 0;
-
-    for (auto c : str) {
-        hash ^= static_cast<uint32_t>(0x72896521);
-        hash += c;
+        unsigned int k1 = *data++;
+        k1 *= m; k1 ^= k1 >> r; k1 *= m;
+        h1 *= m; h1 ^= k1;
+        len -= 4;
     }
 
-    return hash;
-}
+    switch(len) {
 
-uint32_t murmur_hash(const std::string& str) {
-
-    uint32_t hash = 0;
-
-    MurmurHash3_x86_32(str.c_str(), str.length(), 0x123317, &hash);
-
-    return hash;
-}
-
-
-static inline uint32_t rotl32 ( uint32_t x, int8_t r )
-{
-return (x << r) | (x >> (32 - r));
-}
-
-#define getblock(p, i) (p[i])
-
-static inline uint32_t fmix32 ( uint32_t h )
-{
-h ^= h >> 16;
-h *= 0x85ebca6b;
-h ^= h >> 13;
-h *= 0xc2b2ae35;
-h ^= h >> 16;
-
-return h;
-}
-
-void MurmurHash3_x86_32 ( const void * key, int len,
-                          uint32_t seed, void * out )
-{
-    const uint8_t * data = (const uint8_t*)key;
-    const int nblocks = len / 4;
-    int i;
-
-    uint32_t h1 = seed;
-
-    uint32_t c1 = 0xcc9e2d51;
-    uint32_t c2 = 0x1b873593;
-
-    //----------
-    // body
-
-    const uint32_t * blocks = (const uint32_t *)(data + nblocks*4);
-
-    for(i = -nblocks; i; i++)
-    {
-        uint32_t k1 = getblock(blocks,i);
-
-        k1 *= c1;
-        k1 = rotl32(k1,15);
-        k1 *= c2;
-
-        h1 ^= k1;
-        h1 = rotl32(h1,13);
-        h1 = h1*5+0xe6546b64;
-    }
-
-    //----------
-    // tail
-
-    const uint8_t * tail = (const uint8_t*)(data + nblocks*4);
-
-    uint32_t k1 = 0;
-
-    switch(len & 3)
-    {
-        case 3: k1 ^= tail[2] << 16;
-        case 2: k1 ^= tail[1] << 8;
-        case 1: k1 ^= tail[0];
-            k1 *= c1; k1 = rotl32(k1,15); k1 *= c2; h1 ^= k1;
+        case 3: h2 ^= ((unsigned char*)data)[2] << 16;
+        case 2: h2 ^= ((unsigned char*)data)[1] << 8;
+        case 1: h2 ^= ((unsigned char*)data)[0];
+                h2 *= m;
     };
 
-    //----------
-    // finalization
+    h1 ^= h2 >> 18; h1 *= m;
+    h2 ^= h1 >> 22; h2 *= m;
+    h1 ^= h2 >> 17; h1 *= m;
+    h2 ^= h1 >> 19; h2 *= m;
 
-    h1 ^= len;
+    uint64_t h = h1;
 
-    h1 = fmix32(h1);
+    h = (h << 32) | h2;
 
-    *(uint32_t*)out = h1;
+    return h;
 }
+
