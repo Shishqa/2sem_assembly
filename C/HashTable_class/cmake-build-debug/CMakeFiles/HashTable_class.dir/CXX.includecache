@@ -45,7 +45,11 @@ HashTableIterator.h
 /home/shishqa/repositories/MIPT/2020_2/asm/C/HashTable_class/main.cpp
 fstream
 -
+iostream
+-
 string
+-
+unordered_map
 -
 c_HashTable.h
 /home/shishqa/repositories/MIPT/2020_2/asm/C/HashTable_class/c_HashTable.h

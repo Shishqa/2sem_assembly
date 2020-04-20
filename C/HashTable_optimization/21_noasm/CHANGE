@@ -1,0 +1,4 @@
+calculating reminder of division of hash by table size was hot
+so I made table size equal to power of 2 in order to divide faster
+
+new time: 5.7s

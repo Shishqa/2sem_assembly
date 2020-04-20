@@ -1,0 +1,4 @@
+optimized memory access in hot operations in murmurhash
+164 -- 185
+
+new time: 7s

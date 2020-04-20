@@ -171,15 +171,7 @@ HashTable<Key, T, Hash, KeyEqual>::find(const key_t& key) const {
 
     const Hash hasher;
 
-    size_t idx = 0;
-
-    if (((BUCKET_COUNT - 1) & UINT64_MAX) == BUCKET_COUNT - 1) {
-        idx = hasher(key) & (BUCKET_COUNT - 1);
-    } else {
-        idx = hasher(key) % BUCKET_COUNT;
-    }
-
-    return hash_table[idx].find_data(key);
+    return hash_table[hasher(key) % BUCKET_COUNT].find_data(key);
 
 }
 
@@ -243,14 +235,7 @@ HashTable<Key, T, Hash, KeyEqual>::insert(const value_t& value) {
 
     const Hash hasher;
 
-    size_t idx = 0;
-
-    if (((BUCKET_COUNT - 1) & UINT64_MAX) == BUCKET_COUNT - 1) {
-        idx = hasher(value.key) & (BUCKET_COUNT - 1);
-    } else {
-        idx = hasher(value.key) % BUCKET_COUNT;
-    }
-
+    unsigned long long idx = hasher(value.key) % BUCKET_COUNT;
     size_t old_size = hash_table[idx].size();
 
     const value_t& val = hash_table[idx].insert(value);
