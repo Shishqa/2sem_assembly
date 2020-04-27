@@ -1,1 +1,1 @@
-/usr/bin/c++   -O0 -Wall -g   CMakeFiles/HashTable_class.dir/main.cpp.o  -o HashTable_class 
+/usr/bin/c++   -O0 -Wall -msse4.2 -g   CMakeFiles/HashTable_class.dir/main.cpp.o  -o HashTable_class 

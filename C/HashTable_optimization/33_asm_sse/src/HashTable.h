@@ -35,7 +35,6 @@ public:
     typedef Node node_t;
 
     class Bucket;
-
     typedef Bucket bucket_t;
 
     template <typename ValueType>
@@ -51,8 +50,6 @@ public:
               const size_t& bucket_count);
 
     HashTable(const HashTable& other);
-
-    HashTable& operator=(const HashTable& other);
 
     //Destructor
     ~HashTable();
@@ -117,27 +114,6 @@ HashTable<Key, T, Hash, KeyEqual>::HashTable(const HashTable& other) :
     }
 }
 
-
-template <class Key, class T, class Hash, class KeyEqual>
-HashTable<Key, T, Hash, KeyEqual>&
-HashTable<Key, T, Hash, KeyEqual>::operator=(const HashTable<Key, T, Hash, KeyEqual>& other) {
-
-    if (&other == this) {
-        return *this;
-    }
-
-    if (BUCKET_COUNT != other.BUCKET_COUNT) {
-        throw std::runtime_error("Bad hashtable assignment (size is different)\n");
-    }
-
-    this->clear();
-
-    this->current_size = other.current_size;
-
-    for (size_t i = 0; i < BUCKET_COUNT; ++i) {
-        new(hash_table + i) Bucket(other.hash_table[i]);
-    }
-}
 
 template <class Key, class T, class Hash, class KeyEqual>
 HashTable<Key, T, Hash, KeyEqual>::HashTable::HashTable(std::initializer_list<std::pair<key_t, mapped_t>> init,
@@ -309,6 +285,7 @@ size_t HashTable<Key, T, Hash, KeyEqual>::size() const {
 
     return current_size;
 }
+
 
 
 #endif //HASHTABLE_CLASS_HASHTABLE_H

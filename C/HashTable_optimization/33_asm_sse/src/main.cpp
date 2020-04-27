@@ -24,7 +24,6 @@ int main() {
 
     HashTable<std::string, int, HashCRC32, StrEqual> hash_table(0x4000);
 
-
     std::ifstream fin("DATA");
 
     size_t find_request_count = 0;
@@ -85,49 +84,23 @@ int main() {
 
 bool StrEqual::operator()(const std::string& str1, const std::string& str2) const {
 
+    const size_t str1_len = str1.length();
+
+    if (str1_len != str2.length()) {
+        return false;
+    }
+
     const char* str1_c = str1.c_str();
     const char* str2_c = str2.c_str();
-    int check = 0;
+    const char* str1_end = str1_c + str1_len;
 
-    __asm__ (".intel_syntax noprefix\n"
-             "sub       rax, rdx\n"
-             "sub       rdx, 16\n"
-             ".strloop:\n"
-             "add       rdx, 16\n"
-             "movdqu    xmm0, [rdx]\n"
-             "pcmpistri xmm0, [rdx+rax], 0b00011000\n"
-             "ja        .strloop\n"
-             "jc        .not_eq\n"
-             "mov       rax, 1\n"
-             "jmp       .quit\n"
-             ".not_eq:\n"
-             "xor       rax, rax\n"
-             ".quit:\n"
-             ".att_syntax prefix\n"
-            : "=a" (check)
-            : "a" (str1_c), "d" (str2_c)
-            : "xmm0", "rcx"
-            );
+    for (;str1_c < str1_end; ++str1_c, ++str2_c) {
+        if (*str1_c != *str2_c) {
+            return false;
+        }
+    }
 
-            return check;
-
-//    const size_t str1_len = str1.length();
-//
-//    if (str1_len != str2.length()) {
-//        return false;
-//    }
-//
-//    const char* str1_c = str1.c_str();
-//    const char* str2_c = str2.c_str();
-//    const char* str1_end = str1_c + str1_len;
-//
-//    for (;str1_c < str1_end; ++str1_c, ++str2_c) {
-//        if (*str1_c != *str2_c) {
-//            return false;
-//        }
-//    }
-//
-//    return true;
+    return true;
 }
 
 uint64_t HashCRC32::operator()(const std::string& str_key) const {

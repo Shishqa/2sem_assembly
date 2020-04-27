@@ -1,0 +1,3 @@
+intel intrinsic hash -> inline asm crc32 hash 
+
+new time: 4.4s
