@@ -1,0 +1,3 @@
+sse crc32 hash counting by intel intrinsic
+
+new time: 4.9s 

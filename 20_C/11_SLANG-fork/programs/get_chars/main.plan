@@ -1,0 +1,16 @@
+% Пытаемся выводить символы
+
+def main ()
+{
+	var s = input()
+
+	while (s != 0)
+	{
+		putc (s)
+		putc (10)
+
+		s = input ()
+	}
+
+	return (0)
+}

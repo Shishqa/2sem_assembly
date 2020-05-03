@@ -1,0 +1,6 @@
+rewritten str comparator in order to use char* iterator instead of int
+
+made ariphmetic block inline by define
+it seems bad but compiler don't process inline funcs properly :C
+
+new time: 5s

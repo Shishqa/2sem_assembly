@@ -1,9 +1,0 @@
-#!/bin/zsh
-
-if [ $# != 2 ]; then
-    echo "incorrect num of args"
-    ./crack
-else
-    ./crack $1 -o $2
-    chmod +x $2
-fi

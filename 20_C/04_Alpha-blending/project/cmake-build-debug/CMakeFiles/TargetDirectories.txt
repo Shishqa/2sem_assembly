@@ -1,0 +1,3 @@
+/home/shishqa/repositories/MIPT/2020_2/asm/C/04_img_blend/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/shishqa/repositories/MIPT/2020_2/asm/C/04_img_blend/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/shishqa/repositories/MIPT/2020_2/asm/C/04_img_blend/cmake-build-debug/CMakeFiles/05_img_blend.dir
