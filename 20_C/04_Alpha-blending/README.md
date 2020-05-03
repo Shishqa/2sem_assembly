@@ -4,11 +4,11 @@
 
 #### Сборка и запуск 
 
-> make all
-
-> cd bin
-
-> ./blender ../examples/01/CAT.bmp ../examples/01/DESK.bmp -o RES.bmp
-
-> feh RES.bmp
+> $ make all
+>
+> $ cd bin
+>
+> $ ./blender ../examples/01/CAT.bmp ../examples/01/DESK.bmp -o RES.bmp
+>
+> $ feh RES.bmp
 
