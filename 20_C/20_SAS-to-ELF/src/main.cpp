@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "SMUtils.hpp";
+#include "SMUtils.hpp"
 
 const char* DEFAULT_OUT_FILE = "a.out";
 

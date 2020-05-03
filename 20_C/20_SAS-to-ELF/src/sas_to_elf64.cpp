@@ -10,39 +10,62 @@ typedef int     DWORD;
 typedef long    QWORD;
 
 #pragma pack(1)
+struct program_header {
+
+    /*!*/ DWORD SEGMENT_TYPE        = 1;
+    /*!*/ DWORD FLAGS               = 5;
+    /*!*/ QWORD P_OFFSET            = 0;
+    /*!*/ QWORD P_VADDR             = 0x400000;
+    /*!*/ QWORD UNDEF               = 0;
+    /*!*/ QWORD P_FILESZ            = 0;
+    /*!*/ QWORD P_MEMSZ             = 0;
+    /*!*/ QWORD ALIGNMENT           = 0x1000;
+};
+
 struct elf_header {
 
     const BYTE  TEXT_SHIELD         = 0x7F;             // editors, it is not a text file!
     const BYTE  ELF_ASCII[3]        = {'E','L','F'};    // format specification
 
-    const BYTE  BITNESS             = 2;        // 64bit 
-    const BYTE  NUMBER_FORMAT       = 1;        // little endian
+    const BYTE  CLASS               = 2;                // ELF64 
+    const BYTE  NUMBER_FORMAT       = 1;                // little endian
 
-    const BYTE  ELF_HEADER_VER      = 1;        // ????
-    const BYTE  OS_ABI              = 0;        // system V
+    const BYTE  ELF_HEADER_VER      = 1;                // 
+    const BYTE  OS_ABI              = 0;                // System V
 
-    const QWORD PADDING             = 0;        // unused
+    const QWORD PADDING             = 0;                // unused
 
-    const WORD  ELF_TYPE            = 2;        // executable
-    const WORD  INSTRUCTION_SET     = 0x3E;     // x86_64 instruction set
-    const DWORD ELF_VERSION         = 1;        // ????
+    const WORD  ELF_TYPE            = 2;                // EXEC
+    const WORD  INSTRUCTION_SET     = 0x3E;             // x86_64 instruction set
+    const DWORD ELF_VERSION         = 1;                // 
 
-    /*!*/ QWORD ENTRY_POS           = 0;
-    /*!*/ QWORD PROGRAM_HEADER_POS  = 0;
-    /*!*/ QWORD SECTION_HEADER_POS  = 0;
+    /*!*/ QWORD entry_addr          = 0x400000 + sizeof(elf_header) + sizeof(program_header);
+    /*!*/ QWORD ph_offset           = sizeof(elf_header);
+    /*!*/ QWORD sh_offset           = 0;
 
-    const DWORD FLAGS               = 0;        // ????
+    const DWORD FLAGS               = 0;                // ????
     
-    /*!*/ WORD  HEADER_SIZE         = sizeof(elf_header);
-    /*!*/ WORD  ENTRY_PROG_SIZE     = 0;
-    /*!*/ WORD  NUM_OF_PROG_ENTRIES = 0;
-    /*!*/ WORD  ENTRY_SECT_SIZE     = 0;
-    /*!*/ WORD  NUM_OF_SECT_ENTRIES = 0;
-    /*!*/ WORD  SECT_TABLE_IDX      = 0;        // ???
+    /*!*/ WORD  header_size         = sizeof(elf_header);
+    /*!*/ WORD  ph_size             = sizeof(program_header);
+    /*!*/ WORD  num_of_ph           = 1;
+    /*!*/ WORD  sh_size             = 0;
+    /*!*/ WORD  num_of_sh           = 0;
+    /*!*/ WORD  sh_str_table_idx    = 0;                
+};
+
+struct return_0 {
+
+    const BYTE    mov_rax           = 0xB8;
+    const DWORD   x3C               = 0x3C;
+    const BYTE    xor_rdi_rdi[3]    = {0x48, 0x31, static_cast<char>(0xFF)};
+    const BYTE    syscall[2]        = {0x0F, 0x05};
+
 };
 #pragma pack()
 
-const elf_header ELF_HEADER;
+const elf_header        ELF_HEADER;
+      program_header    PROG_HEADER;
+const return_0          RET;
 
 void SMU::sas_to_elf64(const char* in_file, const char* out_file) {
 
@@ -74,7 +97,12 @@ void SMU::sas_to_elf64(const char* in_file, const char* out_file) {
         throw std::runtime_error("can't write to specified output path");
     }
 
+    PROG_HEADER.P_FILESZ = sizeof(elf_header) + sizeof(program_header) + sizeof(return_0);
+    PROG_HEADER.P_MEMSZ = PROG_HEADER.P_FILESZ;
+
     out_fs.write(reinterpret_cast<const char*>(&ELF_HEADER), sizeof(ELF_HEADER));
+    out_fs.write(reinterpret_cast<const char*>(&PROG_HEADER), sizeof(PROG_HEADER));
+    out_fs.write(reinterpret_cast<const char*>(&RET), sizeof(RET));
 
     out_fs.close();
 }
