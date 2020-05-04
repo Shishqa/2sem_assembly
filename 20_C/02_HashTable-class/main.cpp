@@ -22,8 +22,11 @@ public:
 
 int main() {
 
-    HashTable<std::string, int, HashCRC32, StrEqual> hash_table(0x4000);
+    const size_t HASHTABLE_SIZE = 0x4000;
 
+    //std::unordered_map<std::string, int, HashCRC32, StrEqual> hash_table(HASHTABLE_SIZE);
+
+    HashTable<std::string, int, HashCRC32, StrEqual> hash_table(HASHTABLE_SIZE);
 
     std::ifstream fin("DATA");
 
@@ -45,19 +48,19 @@ int main() {
     std::string requests[MAX_STR_LEN] = {
             "a",
             "aa",
-            "aaa",
+            "$$$",
             "aaaa",
             "aaaaa",
-            "aaaaaa",
+            "dasjaa",
             "aaaaaaa",
-            "aaaaaaaa",
-            "aaaaaaaaa",
-            "aaaaaaaaaa",
-            "aaaaaaaaaaa",
+            "adlaaaaa",
+            "#$*#$(#Na",
+            "aavn42asdf",
+            "ffffffffffa",
             "aaaaaaaaaaaa",
-            "aaaaaaaaaaaaa",
-            "aaaaaaaaaaaaaa",
-            "aaaaaaaaaaaaaaa"
+            "aaa2378424aaa",
+            "asaasaafaaafaa",
+            "vaavaaaagggaaaa"
     };
 
     for (size_t i = 0; i < find_request_count; ++i) {
@@ -66,74 +69,63 @@ int main() {
 
     }
 
-//    std::cout << "Done\n";
-//
-//    std::ofstream fout("dispersion_change.csv");
-//
-//    for (auto bucket : hash_table) {
-//
-//        std::cout << bucket.size() << " ; \n";
-//        fout << bucket.size() << " ; \n";
-//
-//    }
-//
-//    fout.close();
-
     return 0;
 }
 
 
 bool StrEqual::operator()(const std::string& str1, const std::string& str2) const {
 
-    const char* str1_c = str1.c_str();
-    const char* str2_c = str2.c_str();
-    int check = 0;
-
-    __asm__ (".intel_syntax noprefix\n"
-             "sub       rax, rdx\n"
-             "sub       rdx, 16\n"
-             ".strloop:\n"
-             "add       rdx, 16\n"
-             "movdqu    xmm0, [rdx]\n"
-             "pcmpistri xmm0, [rdx+rax], 0b00011000\n"
-             "ja        .strloop\n"
-             "jc        .not_eq\n"
-             "mov       rax, 1\n"
-             "jmp       .quit\n"
-             ".not_eq:\n"
-             "xor       rax, rax\n"
-             ".quit:\n"
-             ".att_syntax prefix\n"
-            : "=a" (check)
-            : "a" (str1_c), "d" (str2_c)
-            : "xmm0", "rcx"
-            );
-
-            return check;
-
-//    const size_t str1_len = str1.length();
-//
-//    if (str1_len != str2.length()) {
-//        return false;
-//    }
-//
 //    const char* str1_c = str1.c_str();
 //    const char* str2_c = str2.c_str();
-//    const char* str1_end = str1_c + str1_len;
+//    int check = 0;
 //
-//    for (;str1_c < str1_end; ++str1_c, ++str2_c) {
-//        if (*str1_c != *str2_c) {
-//            return false;
-//        }
-//    }
+//    __asm__ (".intel_syntax noprefix\n"
+//             "sub       rax, rdx\n"
+//             "sub       rdx, 16\n"
+//             ".strloop:\n"
+//             "add       rdx, 16\n"
+//             "movdqu    xmm0, [rdx]\n"
+//             "pcmpistri xmm0, [rdx+rax], 0b00011000\n"
+//             "ja        .strloop\n"
+//             "jc        .not_eq\n"
+//             "mov       rax, 1\n"
+//             "jmp       .quit\n"
+//             ".not_eq:\n"
+//             "xor       rax, rax\n"
+//             ".quit:\n"
+//             ".att_syntax prefix\n"
+//            : "=a" (check)
+//            : "a" (str1_c), "d" (str2_c)
+//            : "xmm0", "rcx"
+//            );
 //
-//    return true;
+//    return check;
+
+    const size_t str1_len = str1.length();
+
+    if (str1_len != str2.length()) {
+        return false;
+    }
+
+    const char* str1_c = str1.c_str();
+    const char* str2_c = str2.c_str();
+    const char* str1_end = str1_c + str1_len;
+
+    for (;str1_c < str1_end; ++str1_c, ++str2_c) {
+        if (*str1_c != *str2_c) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 uint64_t HashCRC32::operator()(const std::string& str_key) const {
 
     const void* key = str_key.c_str();
     int len = str_key.length();
+
+    uint64_t hash = 0;
 
     __asm__ (".intel_syntax noprefix\n"
              "xor       rax, rax\n"
@@ -166,10 +158,12 @@ uint64_t HashCRC32::operator()(const std::string& str_key) const {
              "crc32b    rax, dil\n"
              ".exit:\n"
              ".att_syntax prefix\n"
-            :
+            : "=a" (hash)
             : "S" (key), "c" (len)
-            : "rax"
+            :
             );
+
+    return hash;
 
 //    while (len >= 8) {
 //        hash = _mm_crc32_u64(hash, *reinterpret_cast<const uint64_t*>(key));

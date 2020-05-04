@@ -1,4 +1,4 @@
-# Install script for directory: /home/shishqa/repositories/MIPT/2020_2/asm/C/02_HashTable_class
+# Install script for directory: /home/shishqa/repositories/MIPT/2020_2/asm/20_C/02_HashTable-class
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/shishqa/repositories/MIPT/2020_2/asm/C/02_HashTable_class/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/shishqa/repositories/MIPT/2020_2/asm/20_C/02_HashTable-class/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
