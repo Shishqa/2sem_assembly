@@ -5,7 +5,6 @@
 #include "Image.h"
 #include <cstdio>
 
-
 Image::Image(const Image& other) :
         _width(other._width),
         _height(other._height),

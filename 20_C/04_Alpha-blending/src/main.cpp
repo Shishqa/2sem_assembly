@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <cstring>
+#include <cctype>
 
 const char* DEFAULT_OUT_FILE = "blended.bmp";
 
@@ -13,6 +14,9 @@ int main(int argc, char** argv) {
     const char* front_filename  = nullptr;
     const char* back_filename   = nullptr;
     const char* output_filename = DEFAULT_OUT_FILE;
+
+    bool no_sse = false;
+    size_t n_runs = 1;
 
     try {
         if (argc >= 3) {
@@ -34,6 +38,26 @@ int main(int argc, char** argv) {
                     throw std::runtime_error("no -o flag argument specified");
                 }
 
+            } else if (!strncmp(argv[arg_it], "-c", 2)) {
+
+                if (arg_it < argc - 1) {
+
+                    ++arg_it;
+
+                    if (*argv[arg_it] < '0' || *argv[arg_it] > '9') {
+                        throw std::runtime_error("-c flag argument must be number");
+                    }
+
+                    sscanf(argv[arg_it], "%lu", &n_runs);
+
+                } else {
+                    throw std::runtime_error("no -c flag argument specified");
+                }
+
+            } else if (!strncmp(argv[arg_it], "-no-sse", 7)) {
+
+                no_sse = true;
+
             } else {
                 throw std::runtime_error("incorrect flag");
             }
@@ -43,7 +67,11 @@ int main(int argc, char** argv) {
         Image back(back_filename);
         Image res(back);
 
-        Blender::blend_images_sse(front, back, res);
+        if (no_sse) {
+            Blender::blend_images_no_sse(front, back, res, n_runs);
+        } else {
+            Blender::blend_images_sse(front, back, res, n_runs);
+        }
 
         std::ofstream fout(output_filename);
         fout << res;
@@ -57,22 +85,25 @@ int main(int argc, char** argv) {
 }
 
 void print_help() {
-    std::cout << "  Alpha-Blender help:\n"
-                 "\n"
-                 "  Usage: ./blend [front] [back] <options>\n"
-                 "\n"
-                 "  OPTIONS\n"
-                 "      -o <name-of-output-file> \n"
-                 "          If you want custom output filename\n"
-                 "          instead of default ("
-                            << DEFAULT_OUT_FILE << ")\n"
-                 "\n"
-                 "      -sse\n"
-                 "          If you want images to be blended with\n"
-                 "          intel sse instructions (faster!)\n";
+    std::cout << "  Alpha-Blender help:                                     \n"
+                 "                                                          \n"
+                 "  Usage: ./blend [front] [back] <options>                 \n"
+                 "                                                          \n"
+                 "  OPTIONS                                                 \n"
+                 "      -o <name-of-output-file>                            \n"
+                 "          If you want custom output filename              \n"
+                 "          instead of default (" << DEFAULT_OUT_FILE << ") \n"
+                 "                                                          \n"
+                 "      -no-sse                                             \n"
+                 "          If you want images to be blended without        \n"
+                 "          using intel SIMD instructions (slower)          \n"
+                 "                                                          \n"
+                 "      -c <number>                                         \n"
+                 "          If you want profile performance, render can be  \n"
+                 "          runned for <number> times (default is 1)        \n";
 }
 
 void print_error(const std::runtime_error& ex) {
-    std::cout << "Error: " << ex.what() << std::endl;
+    std::cout << "  " << ex.what() << std::endl;
     print_help();
 }
