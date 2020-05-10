@@ -1,0 +1,31 @@
+% ##      THIS FILE IS GENERATED AUTOMATICALLY      ##
+% ## CHANGE THE ORIGIN IN ORDER TO CHANGE THIS FILE ##
+
+def Fib (var num)
+{
+	if (num <= 1)
+	{
+		return (num)
+	}
+	return (Fib (num - 1) + Fib (num - 2))
+}
+
+def main ()
+{
+	var m = input ()
+	var n = input ()
+	if (m == 1)
+	{
+		var i = 0
+		while (i <= n)
+		{
+			print (Fib (i))
+			i = i + 1
+		}
+	}
+	else
+	{
+		print (Fib (n))
+	}
+	return (0)
+}
