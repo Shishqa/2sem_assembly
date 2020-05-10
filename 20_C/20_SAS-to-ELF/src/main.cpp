@@ -1,14 +1,14 @@
 #include <iostream>
 #include <cstring>
 
-#include "SMUtils.hpp"
+#include "utils/utils.hpp"
 
 const char* DEFAULT_OUT_FILE = "a.out";
 
 void print_help();
 void print_error(const std::runtime_error& ex);
 
-int main(int argc, char** argv) {
+int main(int argc, const char** argv) {
 
     const char* input_filename  = nullptr;
     const char* output_filename = DEFAULT_OUT_FILE; 
@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        SMU::sas_to_elf64(input_filename, output_filename);
+        sas_to_elf64(input_filename, output_filename);
 
     } catch (const std::runtime_error& ex) {
         print_error(ex);
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 
 void print_error(const std::runtime_error& ex) {
 
-    std::cout << "   " << ex.what() << "\n\n";
+    std::cerr << "   " << ex.what() << "\n\n";
     print_help();
 }
 

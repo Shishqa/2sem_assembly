@@ -1,0 +1,11 @@
+PUSH    1
+PUSH    2
+ADD
+
+PUSH    3
+SUB
+
+PUSH    5
+MUL
+
+END

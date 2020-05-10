@@ -9,7 +9,7 @@ const char* DEFAULT_OUT_FILE = "blended.bmp";
 void print_help();
 void print_error(const std::runtime_error& ex);
 
-int main(int argc, char** argv) {
+int main(int argc, const char** argv) {
 
     const char* front_filename  = nullptr;
     const char* back_filename   = nullptr;

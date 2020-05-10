@@ -1,5 +1,5 @@
 CXX		  := g++
-CXX_FLAGS := -Wall -Wextra -std=c++17 -ggdb
+CXX_FLAGS := -Wall -Wextra -std=c++17 -ggdb -fsanitize=address
 
 BIN	:= bin
 SRC	:= src
@@ -16,7 +16,7 @@ run: clean all
 	clear
 	./$(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
+$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(SRC)/utils/*.cpp $(SRC)/utils/instructions/*.cpp
 	$(CXX) $(CXX_FLAGS) $^ -o $@ 
 
 clean:

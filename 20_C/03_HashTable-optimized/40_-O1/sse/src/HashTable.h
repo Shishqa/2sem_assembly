@@ -77,7 +77,6 @@ public:
 
     bool count(const key_t& key) const;
 
-
     //Modification
     const value_t& insert(const value_t& value);
 
@@ -198,7 +197,7 @@ HashTable<Key, T, Hash, KeyEqual>::find(const key_t& key) const {
 
     size_t idx = 0;
 
-    if (((-BUCKET_COUNT) ^ UINT64_MAX) == BUCKET_COUNT - 1) {
+    if (!(BUCKET_COUNT & (BUCKET_COUNT - 1))) {
         idx = hasher(key) & (BUCKET_COUNT - 1);
     } else {
         idx = hasher(key) % BUCKET_COUNT;
@@ -266,7 +265,13 @@ HashTable<Key, T, Hash, KeyEqual>::insert(const value_t& value) {
 
     const Hash hasher;
 
-    size_t idx = hasher(value.key) % BUCKET_COUNT;
+    size_t idx = 0;
+
+    if (!(BUCKET_COUNT & (BUCKET_COUNT - 1))) {
+        idx = hasher(value.key) & (BUCKET_COUNT - 1);
+    } else {
+        idx = hasher(value.key) % BUCKET_COUNT;
+    }
 
     size_t old_size = hash_table[idx].size();
 
