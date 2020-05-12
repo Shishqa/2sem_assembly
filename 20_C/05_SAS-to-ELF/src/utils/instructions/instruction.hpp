@@ -3,33 +3,38 @@
 
 #include <cstdlib>
 
-class Instruction {
-public:
-    Instruction() = delete;
-    Instruction(const Instruction& other) = delete;
-    Instruction(Instruction&& other) = delete;
+#include "../simple_vector/vector.hpp"
+#include "argument.hpp"
+
+struct Instruction {
+
+    Instruction();
 
     Instruction(const char* op_ptr);
 
-    ~Instruction();
+    Instruction(const Instruction& other) = delete;
 
-    size_t size() const;
+    Instruction(Instruction&& other);
+
+    ~Instruction() = default;
 
     size_t n_args() const;
 
     size_t write(char* dest) const;
 
-private:
-    char* buffer;
-    unsigned int  offset;
-    unsigned char buf_size;
-    unsigned char arg_cnt;
-    char opcode;
-    bool is_active;
+    Vector<const Argument*> arg;
+    size_t jmp_target_idx;
+    const char* opcode;
 
+private:
     // TO BE GENERATED
     
-    void encode_END();
+    size_t write_END (char* dest) const;
+    size_t write_MATH(char* dest) const;
+    size_t write_PUSH(char* dest) const;
+    size_t write_POP (char* dest) const;
+
+
     void encode_PUSH(const char* arg_ptr);
     void encode_POP(const char* arg_ptr);
     void encode_ARITHMETICS();

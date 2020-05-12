@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstring>
 
+#include "simple_vector/vector.hpp"
 #include "elf_custom.hpp"
 #include "utils.hpp"
 
@@ -15,19 +16,16 @@ void sas_to_elf64(const char* in_file, const char* out_file) {
         throw std::runtime_error("unknown input file format");
     }
 
-    const size_t SAS_SIGN_SIZE = 0x19;
+    static const size_t SAS_SIGN_SIZE = 0x19;
 
-    Instruction* x64bit_codes = nullptr;
-    const size_t n_codes = sas_to_arr_of_codes(buffer + SAS_SIGN_SIZE, 
-                                               file_size - SAS_SIGN_SIZE,
-                                               x64bit_codes);
+    Vector<Instruction> x64bit_codes = std::move(encode_sas(buffer    + SAS_SIGN_SIZE, 
+                                                            file_size - SAS_SIGN_SIZE));
+
+    //TODO: OPTIMISATION HERE
+
+    write_elf(out_file, x64bit_codes);
+
     delete[] buffer;
-
-    write_elf(out_file, x64bit_codes, n_codes);
-
-    std::cout << "deleting codes\n";
-
-    ::operator delete(x64bit_codes);
 }
 
 
@@ -52,37 +50,40 @@ size_t read_from_file(const char* path, char*& buf) {
     return file_size;
 }
 
+Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
 
-size_t arr_of_codes_to_buf(const Instruction* codes, const size_t& n_codes,
-                           char*& buf) {
+    Vector<Instruction> codes;
 
-    size_t buf_size = 0; 
+    const char* buf_end = buf + buf_size;
 
-    for (size_t i = 0; i < n_codes; ++i) {
-        buf_size += codes[i].size();
+    for (const char* op_ptr = buf; op_ptr < buf_end; ++op_ptr) {
+        
+        std::cout << "pushing new code\n";
+
+        codes.push_back(std::move(Instruction(op_ptr)));
+
+        std::cout << "moving ptr\n";
+
+        op_ptr += codes[codes.size() - 1].n_args() * sizeof(Argument);
     }
 
-    buf = new char[buf_size];
-    char* buf_ptr = buf;
-
-    for (size_t i = 0; i < n_codes; ++i) {
-        buf_ptr += codes[i].write(buf_ptr);
-        codes[i].~Instruction();
-    }
-
-    return buf_size;
+    return codes;
 }
 
+/*
+ *TODO: OPTIMIZE
+ */
 
-void write_elf(const char* path, const Instruction* codes, 
-                      const size_t& n_codes) {
+
+void write_elf(const char* path, const Vector<Instruction>& codes) {
 
     char* buffer = nullptr;
-    const size_t buf_size = arr_of_codes_to_buf(codes, n_codes, buffer);
+    const size_t buf_size = codes_to_buf(codes, buffer);
 
     std::ofstream out_fs(path, std::ofstream::binary);
 
     if (out_fs.rdstate() & std::ofstream::failbit) {
+        delete[] buffer;
         throw std::runtime_error("can't write to specified output path");
     }
     
@@ -104,23 +105,19 @@ void write_elf(const char* path, const Instruction* codes,
     out_fs.close();
 }
 
+size_t codes_to_buf(const Vector<Instruction>& codes, char*& buf) {
 
-size_t sas_to_arr_of_codes(const char* buf, const size_t& buf_size,
-                                  Instruction*& codes) {
+    /*TODO: FILL JMPs
+     */
 
-    codes = reinterpret_cast<Instruction*>(::operator new(buf_size * sizeof(Instruction)));
+    size_t buf_size = 100000; 
 
-    std::cout << "allocated codes[" << codes << "] of size: " << buf_size << "\n";
+    buf = new char[buf_size];
+    char* buf_ptr = buf;
 
-    size_t n_codes = 0;
-
-    const char* buf_end = buf + buf_size;
-    for (const char* op_ptr = buf; op_ptr < buf_end; ++op_ptr) {
-        std::cout << "created instruction at " << codes + n_codes << "\n";
-        new(codes + n_codes) Instruction(op_ptr);
-        op_ptr += codes[n_codes].n_args() * sizeof(Argument);
-        ++n_codes;
+    for (size_t i = 0; i < codes.size(); ++i) {
+        buf_ptr += codes[i].write(buf_ptr);
     }
 
-    return n_codes;
+    return buf_ptr - buf;
 }

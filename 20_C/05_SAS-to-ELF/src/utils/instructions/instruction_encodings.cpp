@@ -6,81 +6,87 @@
 
 #include "config/defines.hpp"
 
-void Instruction::encode_END() {
+size_t Instruction::write_END(char* dest) const {
 
-    arg_cnt = 0;
-
-    const byte_t END[10] = {0xB8, 0x3C, 0x00, 0x00, 0x00, // mov rax, 0x3c
-                            0x48, 0x31, 0xFF,             // xor rdi, rdi
+    const byte_t END[10] = {MOV_NUM + RAX, 0x3C, 0x00, 0x00, 0x00, 
+                            QWORD_OP, XOR, Operand(3, RDI, RDI),  
                             0x0F, 0x05};                  // syscall
 
-    SET_BUF(sizeof(END))
+    memcpy(dest, END, sizeof(END));
 
-    memcpy(buffer, END, buf_size);
+    return sizeof(END);
 }
 
-void Instruction::encode_PUSH(const char* arg_ptr) {
 
-    arg_cnt = 1;
-    Argument arg(arg_ptr);
+size_t Instruction::write_MATH(char* dest) const {
 
-    if (arg.int_param) {
-        
-        SET_BUF(5)
+    byte_t OP[6] = { POP_REG + RAX,                // pop  rcx
+                     POP_REG + RBX,                // pop  rax
+                     QWORD_OP, 0x00, Operand(3, RBX, RAX),    // ???  rax, rcx
+                     PUSH_REG + RAX };              // push rax
 
-        buffer[0] = PUSH_NUM;
-        memcpy(buffer + 1, &arg.val, sizeof(arg.val));
+    char op = *opcode;
 
-    } else if (arg.reg_param) {
+    if (op == 1) {
+        OP[3] = 0x01;
+    } else if (op == 2) {
+        OP[3] = 0x29;
+    } 
+    /*
+    else if (op == 3) {
+        OP[3] = 0xF7;
+        OP[4] = 0xE9;
+    } else if (op == 4) {
+        OP[0] = 0x90;
+    }*/
 
-        CHECK_REG(arg)
-        SET_BUF(2)
+    memcpy(dest, OP, sizeof(OP));
 
-        buffer[0] = EXT;
-        buffer[1] = PUSH_REG + arg.reg;
+    return sizeof(OP);
+}
+
+size_t Instruction::write_PUSH(char* dest) const {
+
+    const Argument* arg1 = arg[0];
+
+    if (arg1->int_param) {
+
+        *dest = PUSH_NUM;
+        memcpy(dest + 1, &arg1->val, sizeof(arg1->val));
+
+        return 1 + sizeof(arg1->val);
+
+    } else if (arg1->reg_param) {
+
+        CHECK_REG(arg1)
+
+        dest[0] = EXT_REG;
+        dest[1] = PUSH_REG + arg1->reg;
+
+        return 2;
 
     } else {
         throw std::runtime_error("not yet implemented push combination");
     }
 }
 
-void Instruction::encode_POP(const char* arg_ptr) {
+size_t Instruction::write_POP(char* dest) const {
 
-    arg_cnt = 1;
-    Argument arg(arg_ptr);
+    const Argument* arg1 = arg[0];
 
-    if (arg.reg_param && !arg.mem_param && !arg.int_param) {
+    if (arg1->reg_param && !arg1->mem_param && !arg1->int_param) {
         
-        CHECK_REG(arg)
-        SET_BUF(2)
+        CHECK_REG(arg1)
 
-        buffer[0] = EXT;
-        buffer[1] = POP_REG + arg.reg;
+        dest[0] = EXT_REG;
+        dest[1] = POP_REG + arg1->reg;
+
+        return 2;
 
     } else {
         throw std::runtime_error("not yet implemented");
     }
 }
 
-void Instruction::encode_ARITHMETICS() {
 
-    arg_cnt = 0;
 
-    byte_t OP[6] = { 0x59,                // pop  rcx
-                     0x58,                // pop  rax
-                     0x48, 0x00, 0xC8,    // ???  rax, rcx
-                     0x50 };              // push rax
-
-    if (opcode == 1) {
-        OP[3] = 0x01;
-    } else if (opcode == 2) {
-        OP[3] = 0x29;
-    } else if (opcode == 3) {
-        OP[3] = 0xF7;
-        OP[4] = 0xE9;
-    }
-
-    SET_BUF(sizeof(OP))
-
-    memcpy(buffer, OP, sizeof(OP));
-}

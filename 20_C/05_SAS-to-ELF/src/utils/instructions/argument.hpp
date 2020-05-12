@@ -6,16 +6,16 @@ struct Argument {
 	char int_param : 1;     // val field is valid
 	char reg_param : 1;     // reg field is valid
 	char mem_param : 1;     
-	char sum_param : 1;     // wasn't implemented ? 
+	char sum_param : 1;      
 	char nop	   : 4;
 	char reg;               // register id
 	int  val;               // int value
 
-    Argument() = delete;
-    Argument(const Argument& other) = delete;
-    Argument(Argument&& other) = delete;
+    Argument() = default;
 
-    explicit Argument(const char* arg_ptr);
+    Argument(const Argument& other) = default;
+
+    Argument(Argument&& other) = default;
 
     ~Argument() = default;
 };
