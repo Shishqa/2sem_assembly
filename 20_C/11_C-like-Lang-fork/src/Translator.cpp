@@ -70,8 +70,13 @@ bool Translator::GetAsmCode (BinaryTree <Token> * tree, const char * output_path
 
     Init (f);
 
-    fprintf (out, "; ##      THIS FILE IS GENERATED AUTOMATICALLY      ##\n");
-    fprintf (out, "; ## CHANGE THE ORIGIN IN ORDER TO CHANGE THIS FILE ##\n");
+    fprintf (out, "; ##      THIS FILE IS GENERATED AUTOMATICALLY      ##\n"
+                  "; ## CHANGE THE ORIGIN IN ORDER TO CHANGE THIS FILE ##\n"
+                  "                                                      \n"
+                  "         _global _start                               \n"
+                  "         section .text                                \n"
+                  "                                                      \n"
+                  "_start:                                               \n");
 
     Proceed ();
     
@@ -109,9 +114,11 @@ void Translator::Init (FILE * f)
 
 void Translator::Proceed ()
 {
-    fprintf (out, "\tCALL\tfunc_main\n");
-    fprintf (out, "\tMOV\t\t%d\tex\n", VAR_MAX);
-    fprintf (out, "\tEND\n\n");
+    fprintf (out, "     call    func_main      \n"
+                  "     mov     rax, 0x3C      \n"
+                  "     xor     rdi, rdi       \n"
+                  "     syscall                \n");
+
     GetBlocks (prog->root);
 }
 
@@ -194,7 +201,7 @@ void Translator::DefFunc (Node<Token> * node)
 {
     PRINT ("func\n");
 
-    fprintf (out, ";#####################################################################\n", var_cnt);
+    fprintf (out, ";#####################################################################\n");
 
     int check = FindFunc (R->data.name, R->data.data);
 
@@ -213,8 +220,9 @@ void Translator::DefFunc (Node<Token> * node)
     curr_func->local_var = (Variable *) calloc (curr_func->VAR_MAX, sizeof (*curr_func->local_var));
     curr_func->var_cnt   = 1;
     
-    fprintf (out, ";\tfunction \"%s\"\n", curr_func->name);
-    fprintf (out, "func_%s:\n", curr_func->name);
+    fprintf (out, ";#DEF %s(%d){...}    \n"
+                  "func_%s:             \n", 
+                  curr_func->name, curr_func->name);
 
     Node<Token> * curr_arg = L;
 

@@ -1,11 +1,11 @@
 PUSH    1
+POP     ax
 PUSH    2
+POP     bx
+
+PUSH    ax
+PUSH    bx
 ADD
-
-PUSH    3
-SUB
-
-PUSH    5
-MUL
+POP     ax
 
 END
