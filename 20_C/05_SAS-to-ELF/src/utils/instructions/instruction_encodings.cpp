@@ -58,20 +58,59 @@ char* Instruction::write_MATH(char* dest) const {
 
 char* Instruction::write_IN(char* dest) const {
 
-    const int TEST_VAL = 1;
+    byte_t IN[48] = {QWORD_OP, 0x83, 0xEC, 0x0A,
+                   QWORD_OP, XOR, Operand(3, RAX, RAX),
+                   QWORD_OP, XOR, Operand(3, RDI, RDI),
+                   MOV_NUM + RDX, 0x0A, 0x00, 0x00, 0x00,
+                   QWORD_OP, MOV_REG, Operand(3, RSP, RSI),
+                   WIDE_OP, SYSCALL,
+                   0xAC,                // lodsb
+                   0x3C, 0x30,
+                   0x72, 0x12,
+                   0x3C, 0x39,
+                   0x77, 0x0E,
+                   0x2C, 0x30,
+                   QWORD_OP, 0x6B, Operand(3, RDI, RDI), 0x0A,
+                   QWORD_OP, ADD, Operand(3, RAX, RDI),
+                   QWORD_OP, 0xFF, 0xCA,
+                   0x73, 0xE9,
+                   QWORD_OP, 0x83, 0xC4, 0x0A,
+                   PUSH_REG + RDI};
 
-    *dest = PUSH_NUM;
-    memcpy(++dest, &TEST_VAL, sizeof(TEST_VAL));
+    memcpy(dest, IN, sizeof(IN));
 
-    return dest + sizeof(TEST_VAL);
+    return dest + sizeof(IN);
 }
 
 
 char* Instruction::write_OUT(char* dest) const {
 
-    *dest = POP_REG + RDI;
+    byte_t OUT[62] = { 0x59,
+                     0x48, 0x89, 0xE7,
+                     0x48, 0x83, 0xEC, 0x0B,
+                     0xBB, 0x0A, 0x00, 0x00, 0x00,
+                     0xFD,
+                     0xC6, 0x07, 0x00,
+                     0x48, 0xFF, 0xCF,
+                     0x31, 0xD2,
+                     0x89, 0xC8, 
+                     0xF7, 0xF3,
+                     0x89, 0xC1,
+                     0x88, 0xD0,
+                     0x04, 0x30,
+                     0xAA,
+                     0x83, 0xF9, 0x00,
+                     0x75, 0xEE,
+                     0xB8, 0x01, 0x00, 0x00, 0x00,
+                     0x48, 0x89, 0xFE,
+                     0xBF, 0x01, 0x00, 0x00, 0x00,
+                     0xBA, 0x0A, 0x00, 0x00, 0x00,
+                     0x0F, 0x05,
+                     0x48, 0x83, 0xC4, 0x0B };
 
-    return dest + 1;
+    memcpy(dest, OUT, sizeof(OUT));
+
+    return dest + sizeof(OUT);
 }
 
 
