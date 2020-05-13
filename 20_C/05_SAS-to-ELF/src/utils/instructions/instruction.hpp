@@ -8,7 +8,12 @@
 
 struct Instruction {
 
-    Instruction();
+    static void set_buf_begin(const char* begin);
+    static void resize_offsets(const size_t& size);
+
+    //
+
+    Instruction() = delete;
 
     Instruction(const char* op_ptr);
 
@@ -20,28 +25,31 @@ struct Instruction {
 
     size_t n_args() const;
 
-    size_t write(char* dest) const;
+    void set_addr(char* addr) const;
+
+    char* write() const;
+
+    void fix_jmp() const;
 
     Vector<const Argument*> arg;
-    size_t jmp_target_idx;
     const char* opcode;
 
 private:
+
+    static const char* buf_begin;
+    static Vector<char*> offsets;
+
     // TO BE GENERATED
-    
-    size_t write_END (char* dest) const;
-    size_t write_MATH(char* dest) const;
-    size_t write_PUSH(char* dest) const;
-    size_t write_POP (char* dest) const;
-
-
-    void encode_PUSH(const char* arg_ptr);
-    void encode_POP(const char* arg_ptr);
-    void encode_ARITHMETICS();
-    //void encode_POP(const char* op_ptr);
-    //void encode_PUSH(const char* op_ptr);
-    //void encode_OUT(const char* op_ptr);
-    //void encode_ADD(const char* op_ptr);
+    char* write_END  (char* dest) const;
+    char* write_MATH (char* dest) const;
+    char* write_PUSH (char* dest) const;
+    char* write_POP  (char* dest) const;
+    char* write_IN   (char* dest) const;
+    char* write_OUT  (char* dest) const;
+    char* write_MOV  (char* dest) const;
+    char* write_JMP  (char* dest) const;
+    char* write_JCOND(char* dest) const;
+    char* write_RET  (char* dest) const;
 };
 
 #endif//SAS_INSTRUCTIONS_HPP    

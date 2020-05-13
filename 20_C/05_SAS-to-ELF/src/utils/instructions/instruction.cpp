@@ -6,12 +6,23 @@
 #include "../simple_vector/vector.hpp"
 #include "config/defines.hpp"
 
-Instruction::Instruction() :
+/*Instruction::Instruction() :
         arg(Vector<const Argument*>()),
         jmp_target_idx(0),
         opcode(nullptr) {
 
     std::cout << "created empty instruction\n";
+}*/
+
+const char* Instruction::buf_begin = nullptr;
+Vector<char*> Instruction::offsets;
+
+void Instruction::set_buf_begin(const char* begin) {
+    buf_begin = begin;
+}
+
+void Instruction::resize_offsets(const size_t& size) {
+    offsets = std::move(Vector<char*>(size, nullptr));
 }
 
 Instruction::Instruction(const char* op_ptr) {
@@ -20,7 +31,7 @@ Instruction::Instruction(const char* op_ptr) {
         throw std::runtime_error("passing NULL to Instruction constructor");
     } else if (*op_ptr >= NUM_OF_COMMANDS) {
         throw std::runtime_error("passing not yet implemented opcode");
-    }  
+    }
 
     opcode = op_ptr++;
 
@@ -34,7 +45,6 @@ Instruction::Instruction(const char* op_ptr) {
 
 Instruction::Instruction(Instruction&& other) :
         arg(std::move(other.arg)), 
-        jmp_target_idx(other.jmp_target_idx),
         opcode(other.opcode) {
     std::cout << "moved instruction\n";
 }
@@ -43,29 +53,100 @@ size_t Instruction::n_args() const {
     return arg.size();
 }
 
-size_t Instruction::write(char* dest) const {
-    
-    size_t buf_size = 0;
+void Instruction::set_addr(char* addr) const {
+
+    if (!buf_begin) {
+        throw std::runtime_error("Instruction::buf_begin is not set");
+    } else if (static_cast<size_t>(opcode - buf_begin) >= offsets.size()) {
+        throw std::runtime_error("Instruction::offsets is not resized properly");
+    }
+
+    offsets[opcode - buf_begin] = addr;
+}
+
+char* Instruction::write() const {
+
+    char* dest = offsets[opcode - buf_begin];
 
     switch(*opcode) {
-        case 0:
-            buf_size = write_END(dest);
+
+        case _END:
+            dest = write_END(dest);
             break;
-        case 1:
-        case 2:
-            buf_size = write_MATH(dest);
+
+        case _ADD:
+        case _SUB:
+        case _MUL:
+        case _DIV:
+            dest = write_MATH(dest);
             break;
-        case 7:
-            buf_size = write_POP(dest);
+
+        case _POP:
+            dest = write_POP(dest);
             break;
-        case 10:
-            buf_size = write_PUSH(dest);
+
+        case _IN:
+            dest = write_IN(dest);
             break;
+
+        case _OUT:
+            dest = write_OUT(dest);
+            break;
+
+        case _PUSH:
+            dest = write_PUSH(dest);
+            break;
+
+        case _MOV:
+            dest = write_MOV(dest);
+            break;
+
+        case _JA:
+        case _JAE:
+        case _JB:
+        case _JBE:
+        case _JE:
+        case _JNE:
+            dest = write_JCOND(dest);
+            break;
+
+        case _JMP:
+        case _CALL:
+            dest = write_JMP(dest);
+            break;
+
+        case _RET:
+            dest = write_RET(dest);
+            break;
+
         default:
             throw std::runtime_error("not yet implemented");
             break;
     }
 
-    return buf_size;
+    return dest;
 }
 
+void Instruction::fix_jmp() const {
+
+    if (!IS_JMP[static_cast<size_t>(*opcode)]) {
+        return;
+    }
+
+    char* addr = offsets[opcode - buf_begin];
+    char op = *opcode;
+
+    addr += ((op == _JMP || op == _CALL) ? 1 : 7);
+
+    char* target_addr = offsets[arg[0]->val];
+
+    if (!target_addr) {
+        throw std::runtime_error("jmp address is not aligned");
+    }
+
+    int new_offset  = target_addr - (addr + sizeof(int));
+
+    std::cout << "new_offset = " << new_offset << "\n";
+
+    *reinterpret_cast<int*>(addr) = new_offset;
+}

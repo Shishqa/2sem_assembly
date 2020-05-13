@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <stdexcept>
 
 #include "simple_vector/vector.hpp"
 #include "elf_custom.hpp"
@@ -11,21 +12,27 @@ void sas_to_elf64(const char* in_file, const char* out_file) {
     char* buffer = nullptr;
     const size_t file_size = read_from_file(in_file, buffer);
 
-    if (strncmp(buffer, "SHSH", 4)) {
-        delete[] buffer;
-        throw std::runtime_error("unknown input file format");
-    }
-
     static const size_t SAS_SIGN_SIZE = 0x19;
 
-    Vector<Instruction> x64bit_codes = std::move(encode_sas(buffer    + SAS_SIGN_SIZE, 
-                                                            file_size - SAS_SIGN_SIZE));
+    try {
 
-    //TODO: OPTIMISATION HERE
+        if (strncmp(buffer, "SHSH", 4)) {
+            throw std::runtime_error("unknown input file format");
+        }
+ 
+        Vector<Instruction> x64bit_codes = std::move(encode_sas(buffer    + SAS_SIGN_SIZE, 
+                                                                file_size - SAS_SIGN_SIZE));
+     
+        //TODO: OPTIMISATIONS
 
-    write_elf(out_file, x64bit_codes);
+        write_elf(out_file, x64bit_codes);
 
-    delete[] buffer;
+        delete[] buffer;
+
+    } catch (const std::runtime_error& ex) {
+        delete[] buffer;
+        throw ex;
+    }
 }
 
 
@@ -54,6 +61,9 @@ Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
 
     Vector<Instruction> codes;
 
+    Instruction::set_buf_begin(buf);
+    Instruction::resize_offsets(buf_size);
+
     const char* buf_end = buf + buf_size;
 
     for (const char* op_ptr = buf; op_ptr < buf_end; ++op_ptr) {
@@ -77,16 +87,15 @@ Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
 
 void write_elf(const char* path, const Vector<Instruction>& codes) {
 
-    char* buffer = nullptr;
-    const size_t buf_size = codes_to_buf(codes, buffer);
-
     std::ofstream out_fs(path, std::ofstream::binary);
 
     if (out_fs.rdstate() & std::ofstream::failbit) {
-        delete[] buffer;
         throw std::runtime_error("can't write to specified output path");
     }
-    
+
+    char* buffer = nullptr;
+    const size_t buf_size = codes_to_buf(codes, buffer);
+ 
     ProgHeader p_header = {};
     ElfHeader  e_header = {};
 
@@ -115,8 +124,20 @@ size_t codes_to_buf(const Vector<Instruction>& codes, char*& buf) {
     buf = new char[buf_size];
     char* buf_ptr = buf;
 
-    for (size_t i = 0; i < codes.size(); ++i) {
-        buf_ptr += codes[i].write(buf_ptr);
+    try {
+
+        for (size_t i = 0; i < codes.size(); ++i) {
+            codes[i].set_addr(buf_ptr);
+            buf_ptr = codes[i].write();
+        }
+
+        for (size_t i = 0; i < codes.size(); ++i) {
+            codes[i].fix_jmp();
+        }
+
+    } catch (const std::runtime_error& ex) {
+        delete[] buf;
+        throw ex;
     }
 
     return buf_ptr - buf;

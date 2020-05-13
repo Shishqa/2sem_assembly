@@ -5,8 +5,10 @@
 
 _start:
 
-        imul     rcx
+        jmp       .label
+        mov       r8, 0x3C
 
+.label:
         mov     rax, 0x3C
         xor     rdi, rdi
         syscall
