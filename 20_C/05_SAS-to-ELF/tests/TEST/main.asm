@@ -4,15 +4,29 @@
         section .text
 
 _start:
-        call    .test_in
+        mov     rsi, 65
 
-        mov     rsi, rdi
-
-        call    .test_out
+        call    .test_outc
 
         mov     rax, 60
         xor     rdi, rdi
         syscall
+
+.test_outc:
+        dec     rsp
+        mov     byte [rsp], sil
+
+        mov     rax, 1
+        mov     rsi, rsp
+        mov     rdi, 1
+        mov     rdx, 1
+        push    r11
+        syscall
+        pop     r11
+
+        inc     rsp
+        ret
+
 
 .test_in:
         sub     rsp, 11

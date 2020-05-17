@@ -98,6 +98,10 @@ char* Instruction::write() const {
             dest = write_OUT(dest);
             break;
 
+        case _OUTC:
+            dest = write_OUTC(dest);
+            break;
+
         case _PUSH:
             dest = write_PUSH(dest);
             break;
@@ -125,7 +129,7 @@ char* Instruction::write() const {
             break;
 
         default:
-            throw std::runtime_error("not yet implemented");
+            throw std::runtime_error("not yet implemented opcode");
             break;
     }
 

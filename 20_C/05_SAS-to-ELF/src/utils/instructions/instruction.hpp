@@ -19,9 +19,11 @@ struct Instruction {
 
     Instruction(const Instruction& other) = delete;
 
+    Instruction& operator=(const Instruction& other) = delete;
+
     Instruction(Instruction&& other);
 
-    // operator = - delete
+    Instruction& operator=(Instruction&& other) = delete;
 
     ~Instruction() = default;
 
@@ -48,6 +50,7 @@ private:
     char* write_POP  (char* dest) const;
     char* write_IN   (char* dest) const;
     char* write_OUT  (char* dest) const;
+    char* write_OUTC (char* dest) const;
     char* write_MOV  (char* dest) const;
     char* write_JMP  (char* dest) const;
     char* write_JCOND(char* dest) const;
