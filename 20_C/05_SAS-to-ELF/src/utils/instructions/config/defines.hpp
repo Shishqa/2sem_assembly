@@ -72,7 +72,6 @@ enum JUMPS {
     CALL_NEAR = 0xE8,
     JMP_NEAR  = 0xE9,
     RET_NEAR  = 0xC3,
-
     JA_NEAR   = 0x87,
     JAE_NEAR  = 0x83,
     JB_NEAR   = 0x82,
@@ -87,7 +86,7 @@ enum UTILITY {
     POP_REG  = 0x58,
     MOV_NUM  = 0xB8,
     MOV_REG  = 0x89,
-    CMP_REG  = 0x3B
+    CMP_REG  = 0x39
 };
 
 enum MATH {
@@ -121,15 +120,16 @@ enum COMMANDS {
     _JNE  = 20,
     _CALL = 21,
     _RET  = 22,
-    NUM_OF_COMMANDS = 23
+    _SQRT = 23,
+    NUM_OF_COMMANDS = 24
 };
 
 static const size_t NUM_ARGS[NUM_OF_COMMANDS] = {
-    0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0  
-};//0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22
+    0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1  
+};//0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 
 static const char IS_JMP[NUM_OF_COMMANDS] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0
 };
 
 typedef unsigned char byte_t;

@@ -1,10 +1,9 @@
-#include <iostream>
+
+#include <cstdio>
 
 int main() {
 
-    const char str[10] = {'a', 'b', 0, 'c'};
-
-    std::cout << str << "END\n";
+    printf("%x", -1);    
 
     return 0;
 }

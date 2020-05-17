@@ -4,15 +4,21 @@
         section .text
 
 _start:
-        push    12
-        push    4
 
-        pop     rbx
-        pop     rax
-        xor     rdx, rdx
-        idiv    rbx
+        mov     ebx, 2
 
-        mov     rsi, rax
+        xor     edx, edx
+        mov     eax, -10
+
+        cmp     eax, 0
+        jge     .div
+
+        mov     edx, -1
+
+.div:
+        idiv    ebx
+
+        mov     esi, eax
         call    .test_out
 
         mov     rax, 60
@@ -20,6 +26,7 @@ _start:
         syscall
 
 .test_outc:
+        push    r11
         dec     rsp
         mov     byte [rsp], sil
 
@@ -27,24 +34,32 @@ _start:
         mov     rsi, rsp
         mov     rdi, 1
         mov     rdx, 1
-        push    r11
         syscall
-        pop     r11
 
         inc     rsp
+        pop     r11
         ret
 
 
 .test_in:
+        push    r11
         sub     rsp, 11
 
         xor     rax, rax
         mov     rsi, rsp
         xor     rdi, rdi
         mov     rdx, 10
-        push    r11
         syscall
-        pop     r11
+
+        mov     r11, 1
+        
+        cmp     byte [rsi], '-'
+        jne     .proceed
+
+        mov     r11, -1
+        inc     rsi
+
+.proceed:
 
         cld
         xor     rdi, rdi 
@@ -65,14 +80,26 @@ _start:
 
 .end:
         add     rsp, 11
+        imul    rdi, r11
+        pop     r11
         ret
 
 ;==================================================
 
 .test_out:
 
+        push    r11
         sub     rsp, 11
-    
+
+        mov     r11, 1
+        cmp     esi, 0
+        jge     .continue
+
+        xor     r11, r11
+        neg     rsi
+
+.continue:
+
         mov     rdi, rsp
         add     rdi, 10
 
@@ -82,9 +109,10 @@ _start:
         xor     rcx, rcx
 
 .convert_loop:
+
         xor     edx, edx
         mov     eax, esi
-        div     ebx
+        idiv    ebx
 
         mov     esi, eax
         mov     al, dl
@@ -94,18 +122,27 @@ _start:
         inc     rcx
 
         cmp     esi, 0
-        jne     .convert_loop
+        jne     .convert_loop    
+
+        cmp     r11, 0
+        jne     .positive
+
+        mov     byte [rdi], '-'
+        inc     rcx
+        jmp     .print
+
+.positive:
 
         inc     rdi
 
+.print:
         mov     rax, 1
         mov     rsi, rdi
         mov     rdi, 1
         mov     rdx, rcx
-        push    r11
         syscall
-        pop     r11
 
         add     rsp, 11
+        pop     r11
 
         ret

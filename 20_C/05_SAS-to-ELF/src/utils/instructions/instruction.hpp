@@ -44,18 +44,20 @@ private:
     static Vector<char*> offsets;
 
     // TO BE GENERATED
-    char* write_END  (char* dest) const;
-    char* write_MATH (char* dest) const;
-    char* write_DIV  (char* dest) const;
-    char* write_PUSH (char* dest) const;
-    char* write_POP  (char* dest) const;
-    char* write_IN   (char* dest) const;
-    char* write_OUT  (char* dest) const;
-    char* write_OUTC (char* dest) const;
-    char* write_MOV  (char* dest) const;
-    char* write_JMP  (char* dest) const;
-    char* write_JCOND(char* dest) const;
-    char* write_RET  (char* dest) const;
+    char* write_END   (char* dest) const;
+    char* write_MATH  (char* dest) const;
+    char* write_MUL   (char* dest) const;
+    char* write_DIV   (char* dest) const;
+    char* write_PUSH  (char* dest) const;
+    char* write_POP   (char* dest) const;
+    char* write_IN    (char* dest) const;
+    char* write_OUT   (char* dest) const;
+    char* write_OUTC  (char* dest) const;
+    char* write_MOV   (char* dest) const;
+    char* write_JMP   (char* dest) const;
+    char* write_JCOND (char* dest) const;
+    char* write_RET   (char* dest) const;
+    char* write_SQRT  (char* dest) const;
 };
 
 #endif//SAS_INSTRUCTIONS_HPP    

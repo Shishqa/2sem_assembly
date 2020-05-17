@@ -81,8 +81,11 @@ char* Instruction::write() const {
 
         case _ADD:
         case _SUB:
-        case _MUL:
             dest = write_MATH(dest);
+            break;
+
+        case _MUL:
+            dest = write_MUL(dest);
             break;
 
         case _DIV:
@@ -131,6 +134,10 @@ char* Instruction::write() const {
             dest = write_RET(dest);
             break;
 
+        case _SQRT:
+            dest = write_SQRT(dest);
+            break;
+
         default:
             throw std::runtime_error("not yet implemented opcode");
             break;
@@ -149,7 +156,7 @@ void Instruction::fix_jmp() const {
     char* addr = offsets[opcode - buf_begin];
     char op = *opcode;
 
-    addr += ((op == _JMP || op == _CALL) ? 1 : 7);
+    addr += ((op == _JMP || op == _CALL) ? 1 : 6);
 
     char* target_addr = offsets[arg[0]->val];
 
