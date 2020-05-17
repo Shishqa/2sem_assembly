@@ -6,24 +6,25 @@
 #include "../simple_vector/vector.hpp"
 #include "config/defines.hpp"
 
-/*Instruction::Instruction() :
-        arg(Vector<const Argument*>()),
-        jmp_target_idx(0),
-        opcode(nullptr) {
-
-    std::cout << "created empty instruction\n";
-}*/
+#ifdef DEBUG
+    #define $DBG    if(1)
+#else
+    #define $DBG    if(0)
+#endif
 
 const char* Instruction::buf_begin = nullptr;
 Vector<char*> Instruction::offsets;
+
 
 void Instruction::set_buf_begin(const char* begin) {
     buf_begin = begin;
 }
 
+
 void Instruction::resize_offsets(const size_t& size) {
     offsets = std::move(Vector<char*>(size, nullptr));
 }
+
 
 Instruction::Instruction(const char* op_ptr) {
 
@@ -43,15 +44,18 @@ Instruction::Instruction(const char* op_ptr) {
     }
 }
 
+
 Instruction::Instruction(Instruction&& other) :
         arg(std::move(other.arg)), 
         opcode(other.opcode) {
-    std::cout << "moved instruction\n";
+    $DBG std::cout << "moved instruction\n";
 }
+
 
 size_t Instruction::n_args() const {
     return arg.size();
 }
+
 
 void Instruction::set_addr(char* addr) const {
 
@@ -63,6 +67,7 @@ void Instruction::set_addr(char* addr) const {
 
     offsets[opcode - buf_begin] = addr;
 }
+
 
 char* Instruction::write() const {
 
@@ -127,6 +132,7 @@ char* Instruction::write() const {
     return dest;
 }
 
+
 void Instruction::fix_jmp() const {
 
     if (!IS_JMP[static_cast<size_t>(*opcode)]) {
@@ -145,8 +151,6 @@ void Instruction::fix_jmp() const {
     }
 
     int new_offset  = target_addr - (addr + sizeof(int));
-
-    std::cout << "new_offset = " << new_offset << "\n";
 
     *reinterpret_cast<int*>(addr) = new_offset;
 }

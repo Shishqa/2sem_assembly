@@ -67,12 +67,8 @@ Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
     const char* buf_end = buf + buf_size;
 
     for (const char* op_ptr = buf; op_ptr < buf_end; ++op_ptr) {
-        
-        std::cout << "pushing new code\n";
 
         codes.push_back(std::move(Instruction(op_ptr)));
-
-        std::cout << "moving ptr\n";
 
         op_ptr += codes[codes.size() - 1].n_args() * sizeof(Argument);
     }

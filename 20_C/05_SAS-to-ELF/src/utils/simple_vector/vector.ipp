@@ -1,17 +1,23 @@
 #include <iostream>
 
+#ifdef DEBUG
+    #define $DBG    if(1)
+#else
+    #define $DBG    if(0)
+#endif
+
 template <typename elem_t>
 Vector<elem_t>::Vector() :
         data(nullptr),
         back(nullptr),
         _capacity(0) {
-    std::cout << "constructed empty vector of capacity 0\n";
+    $DBG std::cout << "constructed empty vector of capacity 0\n";
 }
 
 template <typename elem_t>
 Vector<elem_t>::~Vector() {
 
-    std::cout << "destructing " << this << "\n";
+    $DBG std::cout << "destructing " << this << "\n";
 
     if (!data) {
         return;
@@ -21,12 +27,11 @@ Vector<elem_t>::~Vector() {
 
     for (size_t i = 0; i < size; ++i) {
         data[i].~elem_t();
-        std::cout << "elem " << data + i << "destructed\n";
     }   
 
     ::operator delete(data);
 
-    std::cout << "vector deleted\n";
+    $DBG std::cout << "vector deleted\n";
 }
 
 template <typename elem_t>
@@ -38,7 +43,7 @@ Vector<elem_t>::Vector(const size_t& capacity) :
     data = reinterpret_cast<elem_t*>(::operator new(_capacity * sizeof(elem_t)));
     back = data;
 
-    std::cout << "constructed empty vector of capacity " << _capacity << "\n";
+    $DBG std::cout << "constructed empty vector of capacity " << _capacity << "\n";
 }
 
 template <typename elem_t>
@@ -54,7 +59,7 @@ Vector<elem_t>::Vector(const size_t& capacity, const elem_t& init_val) :
         new(data + i) elem_t(init_val);
     }
 
-    std::cout << "constructed vector of capacity " << _capacity << " filled with value\n";
+    $DBG std::cout << "constructed vector of capacity " << _capacity << " filled with value\n";
 }
 
 template <typename elem_t>
@@ -70,7 +75,7 @@ Vector<elem_t>::Vector(const Vector& other) :
         new(data + i) elem_t(other.data[i]);
     }
 
-    std::cout << "vector is copied\n";
+    $DBG std::cout << "vector is copied\n";
 }
 
 template <typename elem_t>
@@ -81,7 +86,7 @@ Vector<elem_t>::Vector(Vector&& other) :
 
     other.data = nullptr;
 
-    std::cout << "moved vector\n";
+    $DBG std::cout << "moved vector\n";
 }
 
 template <typename elem_t> 
@@ -101,7 +106,7 @@ Vector<elem_t>& Vector<elem_t>::operator=(const Vector& other) {
         new(data + i) elem_t(other.data[i]);
     }
 
-    std::cout << "vector copied and assigned\n";
+    $DBG std::cout << "vector copied and assigned\n";
 
     return *this;
 }
@@ -117,7 +122,7 @@ Vector<elem_t>& Vector<elem_t>::operator=(Vector&& other) {
 
     other.data = nullptr;
 
-    std::cout << "vector move assigned\n";
+    $DBG std::cout << "vector move assigned\n";
         
     return *this;
 }
@@ -144,7 +149,7 @@ void Vector<elem_t>::resize(const size_t& new_capacity) {
     back = (size < _capacity ? data + size : 
                                data + _capacity);
 
-    std::cout << "vector resized to size " << new_capacity << "\n";
+    $DBG std::cout << "vector resized to size " << new_capacity << "\n";
 }
 
 template <typename elem_t>

@@ -21,6 +21,8 @@ struct Instruction {
 
     Instruction(Instruction&& other);
 
+    // operator = - delete
+
     ~Instruction() = default;
 
     size_t n_args() const;
