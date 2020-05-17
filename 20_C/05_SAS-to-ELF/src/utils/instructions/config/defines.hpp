@@ -39,8 +39,26 @@ enum REGISTERS {
     RDI = 7
 };
 
+enum EXT_REGISTERS {
+    R8  = 0,
+    R9  = 1,
+    R10 = 2,
+    R11 = 3,
+    R12 = 4,
+    R13 = 5,
+    R14 = 6,
+    R15 = 7
+};
+
 enum SYSTEM {
-    SYSCALL = 0x05
+    SYSCALL = 0x05,
+    CLD     = 0xFC,
+    STD     = 0xFD
+};
+
+enum STRING {
+    STOSB = 0xAA,
+    LODSB = 0xAC
 };
 
 enum EXTENTIONS {
