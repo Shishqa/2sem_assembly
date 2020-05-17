@@ -347,19 +347,19 @@ char* Instruction::write_JCOND(char* dest) const {
     switch (*opcode) {
     
         case _JA:
-            *dest = JA_NEAR;
+            *dest = JG_NEAR;
             break;
 
         case _JAE:
-            *dest = JAE_NEAR;
+            *dest = JGE_NEAR;
             break;
 
         case _JB:
-            *dest = JB_NEAR;
+            *dest = JL_NEAR;
             break;
 
         case _JBE:
-            *dest = JBE_NEAR;
+            *dest = JLE_NEAR;
             break;
 
         case _JE:

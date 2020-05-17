@@ -72,12 +72,18 @@ enum JUMPS {
     CALL_NEAR = 0xE8,
     JMP_NEAR  = 0xE9,
     RET_NEAR  = 0xC3,
+
     JA_NEAR   = 0x87,
     JAE_NEAR  = 0x83,
     JB_NEAR   = 0x82,
     JBE_NEAR  = 0x86,
     JE_NEAR   = 0x84,
-    JNE_NEAR  = 0x85
+    JNE_NEAR  = 0x85,
+
+    JG_NEAR   = 0x8F,
+    JGE_NEAR  = 0x8D,
+    JL_NEAR   = 0x8C,
+    JLE_NEAR  = 0x8E,
 };
 
 enum UTILITY {
