@@ -10,6 +10,8 @@ struct Instruction {
 
     static void set_buf_begin(const char* begin);
     static void resize_offsets(const size_t& size);
+    
+    static char* write_preamble(char* dest);
 
     //
 
@@ -42,6 +44,10 @@ private:
 
     static const char* buf_begin;
     static Vector<char*> offsets;
+
+    static const char* IN_PTR;
+    static const char* OUT_PTR;
+    static const char* OUTC_PTR;
 
     // TO BE GENERATED
     char* write_END   (char* dest) const;

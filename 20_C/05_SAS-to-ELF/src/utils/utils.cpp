@@ -122,6 +122,8 @@ size_t codes_to_buf(const Vector<Instruction>& codes, char*& buf) {
 
     try {
 
+        buf_ptr = Instruction::write_preamble(buf_ptr);
+
         for (size_t i = 0; i < codes.size(); ++i) {
             codes[i].set_addr(buf_ptr);
             buf_ptr = codes[i].write();

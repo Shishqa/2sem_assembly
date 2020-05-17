@@ -15,6 +15,9 @@
 const char* Instruction::buf_begin = nullptr;
 Vector<char*> Instruction::offsets;
 
+const char* Instruction::IN_PTR = nullptr;
+const char* Instruction::OUT_PTR = nullptr;
+const char* Instruction::OUTC_PTR = nullptr;
 
 void Instruction::set_buf_begin(const char* begin) {
     buf_begin = begin;

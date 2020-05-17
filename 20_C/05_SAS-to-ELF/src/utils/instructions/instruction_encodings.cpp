@@ -6,6 +6,127 @@
 
 #include "config/defines.hpp"
 
+char* Instruction::write_preamble(char* dest) {
+    
+    byte_t IN[] = { 
+        EXT_REG, PUSH_REG + R11,                    // push  r11
+        QWORD_OP, 0x83, 0xEC, 0x0B,                 // sub   rsp, 11
+                                                    //
+        QWORD_OP, XOR, Operand(3, RAX, RAX),        // xor   rax, rax ;read
+        QWORD_OP, MOV_REG, Operand(3, RSP, RSI),    // mov   rsi, rsp ;to [rsp]
+        QWORD_OP, XOR, Operand(3, RDI, RDI),        // xor   rdi, rdi ;from STDIN
+        MOV_NUM + RDX, 0x0A, 0x00, 0x00, 0x00,      // mov   edx, 10  ;10 symbols
+        WIDE_OP, SYSCALL,                           // syscall
+                                                    //
+        EXT_REG, MOV_NUM + R11,0x01,0x00,0x00,0x00, // mov   r11d, 1
+        0x80, 0x3E, 0x2D,                           // cmp   byte [rsi], '-'
+        0x75, 0x0A,                                 // jne   .proceed >-----*
+        0x49, 0xC7, 0xC3, 0xFF, 0xFF, 0xFF, 0xFF,   // mov   r11, 0xff..ff  | 
+        QWORD_OP, 0xFF, 0xC6,                       // inc   rsi            |
+                                                    //                      |
+        CLD,                                        // cld <----------------*
+        QWORD_OP, XOR, Operand(3, RDI, RDI),        // xor   rdi, rdi
+        QWORD_OP, XOR, Operand(3, RAX, RAX),        // xor   rax, rax
+                                                    //
+        LODSB,                                      // lodsb <------------*
+        0x2C, 0x30,                                 // sub   al, '0'      |
+        0x3C, 0x09,                                 // cmp   al,  9       |
+        0x77, 0x09,                                 // ja    .end >-------+--*
+        QWORD_OP, 0x6B, 0xFF, 0x0A,                 // imul  rdi, rdi, 10 |  |
+        QWORD_OP, ADD, Operand(3, RAX, RDI),        // add   rdi, rax     |  |
+        0xEB, 0xF0,                                 // jmp   .continue >--*  |
+                                                    //                       |
+        QWORD_OP, 0x83, 0xC4, 0x0B,                 // sub   rsp, 0xb <------*
+        0x49, 0x0F, 0xAF, 0xFB,                     // imul  rdi, r11
+        0x41, 0x5B,                                 // pop   r11
+        RET_NEAR                                    // ret
+    };
+
+    byte_t OUT[] = { 
+
+        EXT_REG, PUSH_REG + R11,                    // push  r11 
+        QWORD_OP, 0x83, 0xEC, 0x0B,                 // sub   rsp, 11
+                                                    //
+        0x41, 0xBB, 0x01, 0x00, 0x00, 0x00,         // mov   r11d, 1
+        0x83, 0xFE, 0x00,                           // cmp   rsi, 0
+        0x7D, 0x05,                                 // jge   .continue >--*
+        0x4D, 0x31, 0xDB,                           // xor   r11, r11     |
+        0xF7, 0xDE,                                 // neg   rsi          |
+                                                    //                    |
+        QWORD_OP, MOV_REG, Operand(3, RSP, RDI),    // mov   rdi, rsp <---*
+        QWORD_OP, 0x83, 0xC7, 0x0A,                 // add   rdi, 10
+        STD,                                        // std
+        MOV_NUM + RBX, 0x0A, 0x00, 0x00, 0x00,      // mov   ebx, 10
+        QWORD_OP, XOR, Operand(3, RCX, RCX),        // xor   rcx, rcx
+                                                    //
+        XOR,  Operand(3, RDX, RDX),                 // xor   edx, edx <--*
+        MOV_REG, Operand(3, RSI, RAX),              // mov   eax, esi    |
+        0xF7, 0xF3,                                 // div   ebx         |
+        MOV_REG, Operand(3, RAX, RSI),              // mov   esi, eax    |
+        0x88, 0xD0,                                 // mov   al, dl      |
+        0x04, 0x30,                                 // add   al, '0'     |
+        STOSB,                                      // stosb             |
+        QWORD_OP, 0xFF, 0xC1,                       // inc   rcx         |
+        0x83, 0xFE, 0x00,                           // cmp   esi, 0      |
+        0x75, 0xEB,                                 // jne   .convert >--*
+                                                    //
+        0x49, 0x83, 0xFB, 0x00,                     // cmp   r11, 0 
+        0x75, 0x08,                                 // jne   .positive >-----*
+        0xC6, 0x07, 0x2D,                           // mov   byte [rdi], '-' |
+        0x48, 0xFF, 0xC1,                           // inc   rcx             |
+        0xEB, 0x03,                                 // jmp   .print >--------+--*
+        0x48, 0xFF, 0xC7,                           // inc   rdi <-----------*  |
+                                                    //                          |
+        MOV_NUM + RAX, 0x01, 0x00, 0x00, 0x00,      // mov   eax, 1   ;write <--*
+        QWORD_OP, MOV_REG, Operand(3, RDI, RSI),    // mov   rsi, rdi ;from [rdi]
+        MOV_NUM + RDI, 0x01, 0x00, 0x00, 0x00,      // mov   edi, 1   ;to STDOUT
+        QWORD_OP, MOV_REG, Operand(3, RCX, RDX),    // mov   rdx, rcx ;RCX symbols
+        WIDE_OP, SYSCALL,                           // syscall
+                                                    //
+        QWORD_OP, 0x83, 0xC4, 0x0B,                 // add   rsp, 11
+        EXT_REG, POP_REG + R11,                     // pop   r11
+        RET_NEAR                                    // ret
+    };             
+
+    byte_t OUTC[] = {
+
+        EXT_REG, PUSH_REG + R11,                    // push r11
+        QWORD_OP, 0xFF, 0xCC,                       // dec  rsp
+                                                    //
+        0x40, 0x88, 0x34, 0x24,                     // mov  byte [rsp], sil
+                                                    //
+        MOV_NUM + RAX, 0x01, 0x00, 0x00, 0x00,      // mov  eax, 1   ;write
+        QWORD_OP, MOV_REG, Operand(3, RSP, RSI),    // mov  rsi, rsp ;from [rsp]
+        MOV_NUM + RDI, 0x01, 0x00, 0x00, 0x00,      // mov  edi, 1   ;to STDOUT
+        MOV_NUM + RDX, 0x01, 0x00, 0x00, 0x00,      // mov  edx, 1   ;1 symbol
+        WIDE_OP, SYSCALL,                           // syscall
+                                                    //
+        QWORD_OP, 0xFF, 0xC4,                       // inc  rsp
+        EXT_REG, POP_REG + R11,                     // pop  r11
+        RET_NEAR                                    // ret
+    };
+    
+    *dest = JMP_NEAR; ++dest;
+    *reinterpret_cast<int*>(dest) = sizeof(IN) + 
+                                    sizeof(OUT) + 
+                                    sizeof(OUTC);
+    dest += sizeof(int);
+
+    IN_PTR = dest;
+    memcpy(dest, IN, sizeof(IN));
+    dest += sizeof(IN);
+
+    OUT_PTR = dest;
+    memcpy(dest, OUT, sizeof(OUT));
+    dest += sizeof(OUT);
+
+    OUTC_PTR = dest;
+    memcpy(dest, OUTC, sizeof(OUTC));
+
+    return dest + sizeof(OUTC);
+}
+
+
 char* Instruction::write_END(char* dest) const {
 
     const byte_t END[10] = {MOV_NUM + RAX, 0x3C, 0x00, 0x00, 0x00, // mov rax, 0x3C 
@@ -88,126 +209,36 @@ char* Instruction::write_DIV(char* dest) const {
 
 char* Instruction::write_IN(char* dest) const {
 
-    byte_t IN[] = { 
+    *dest = CALL_NEAR; ++dest;
 
-        EXT_REG, PUSH_REG + R11,                    // push r11
-        QWORD_OP, 0x83, 0xEC, 0x0B,                 // sub  rsp, 11
-                                                    //
-        QWORD_OP, XOR, Operand(3, RAX, RAX),        // xor  rax, rax ;read
-        QWORD_OP, MOV_REG, Operand(3, RSP, RSI),    // mov  rsi, rsp ;to [rsp]
-        QWORD_OP, XOR, Operand(3, RDI, RDI),        // xor  rdi, rdi ;from STDIN
-        MOV_NUM + RDX, 0x0A, 0x00, 0x00, 0x00,      // mov  edx, 10  ;10 symbols
-        WIDE_OP, SYSCALL,                           // syscall
-                                                    //
-        EXT_REG, MOV_NUM + R11,0x01,0x00,0x00,0x00, // mov  r11d, 1
-        0x80, 0x3E, 0x2D,                           // cmp  byte [rsi], '-'
-        0x75, 0x0A,                                 // jne  .proceed >-----*
-        0x49, 0xC7, 0xC3, 0xFF, 0xFF, 0xFF, 0xFF,   // mov  r11, 0xff..ff  | 
-        QWORD_OP, 0xFF, 0xC6,                       // inc  rsi            |
-                                                    //                     |
-        CLD,                                        // cld <---------------*
-        QWORD_OP, XOR, Operand(3, RDI, RDI),        // xor  rdi, rdi
-        QWORD_OP, XOR, Operand(3, RAX, RAX),        // xor  rax, rax
-                                                    //
-        LODSB,                                      // lodsb <-----------*
-        0x2C, 0x30,                                 // sub  al, '0'      |
-        0x3C, 0x09,                                 // cmp  al,  9       |
-        0x77, 0x09,                                 // ja   .end >-------+--*
-        QWORD_OP, 0x6B, 0xFF, 0x0A,                 // imul rdi, rdi, 10 |  |
-        QWORD_OP, ADD, Operand(3, RAX, RDI),        // add  rdi, rax     |  |
-        0xEB, 0xF0,                                 // jmp  .continue >--*  |
-                                                    //                      |
-        QWORD_OP, 0x83, 0xC4, 0x0B,                 // sub  rsp, 0xb <------*
-        0x49, 0x0F, 0xAF, 0xFB,                     // imul rdi, r11
-        0x41, 0x5B,                                 // pop  r11
-        PUSH_REG + RDI                              // push rdi
-    };
+    *reinterpret_cast<int*>(dest) = IN_PTR - (dest + sizeof(int));
+    dest += sizeof(int);
 
-    memcpy(dest, IN, sizeof(IN));
+    *dest = PUSH_REG + RDI; ++dest;
 
-    return dest + sizeof(IN);
+    return dest;
 }
 
 
 char* Instruction::write_OUT(char* dest) const {
 
-    byte_t OUT[] = { 
+    *dest = POP_REG + RSI; ++dest;
 
-        POP_REG + RSI,                             // pop   rsi
-                                                   //
-        EXT_REG, PUSH_REG + R11,                   // push  r11 
-        QWORD_OP, 0x83, 0xEC, 0x0B,                // sub   rsp, 11
-                                                   //
-        0x41, 0xBB, 0x01, 0x00, 0x00, 0x00,        // mov   r11d, 1
-        0x83, 0xFE, 0x00,                    // cmp   rsi, 0
-        0x7D, 0x05,                                // jge   .continue >--*
-        0x4D, 0x31, 0xDB,                          // xor   r11, r11     |
-        0xF7, 0xDE,                          // neg   rsi          |
-                                                   //                    |
-        QWORD_OP, MOV_REG, Operand(3, RSP, RDI),   // mov   rdi, rsp <---*
-        QWORD_OP, 0x83, 0xC7, 0x0A,                // add   rdi, 10
-        STD,                                       // std
-        MOV_NUM + RBX, 0x0A, 0x00, 0x00, 0x00,     // mov   ebx, 10
-        QWORD_OP, XOR, Operand(3, RCX, RCX),       // xor   rcx, rcx
-                                                   //
-        XOR,  Operand(3, RDX, RDX),                // xor   edx, edx <--*
-        MOV_REG, Operand(3, RSI, RAX),             // mov   eax, esi    |
-        0xF7, 0xF3,                                // div   ebx         |
-        MOV_REG, Operand(3, RAX, RSI),             // mov   esi, eax    |
-        0x88, 0xD0,                                // mov   al, dl      |
-        0x04, 0x30,                                // add   al, '0'     |
-        STOSB,                                     // stosb             |
-        QWORD_OP, 0xFF, 0xC1,                      // inc   rcx         |
-        0x83, 0xFE, 0x00,                          // cmp   esi, 0      |
-        0x75, 0xEB,                                // jne   .convert >--*
-                                                   //
-        0x49, 0x83, 0xFB, 0x00,                    // cmp   r11, 0 
-        0x75, 0x08,                                // jne   .positive >-----*
-        0xC6, 0x07, 0x2D,                          // mov   byte [rdi], '-' |
-        0x48, 0xFF, 0xC1,                          // inc   rcx             |
-        0xEB, 0x03,                                // jmp   .print >--------+--*
-        0x48, 0xFF, 0xC7,                          // inc   rdi <-----------*  |
-                                                   //                          |
-        MOV_NUM + RAX, 0x01, 0x00, 0x00, 0x00,     // mov   eax, 1   ;write <--*
-        QWORD_OP, MOV_REG, Operand(3, RDI, RSI),   // mov   rsi, rdi ;from [rdi]
-        MOV_NUM + RDI, 0x01, 0x00, 0x00, 0x00,     // mov   edi, 1   ;to STDOUT
-        QWORD_OP, MOV_REG, Operand(3, RCX, RDX),   // mov   rdx, rcx ;RCX symbols
-        WIDE_OP, SYSCALL,                          // syscall
-                                                   //
-        QWORD_OP, 0x83, 0xC4, 0x0B,                // add   rsp, 11
-        EXT_REG, POP_REG + R11                     // pop   r11
-    };             
+    *dest = CALL_NEAR;  ++dest;
+    *reinterpret_cast<int*>(dest) = OUT_PTR - (dest + sizeof(int));
 
-    memcpy(dest, OUT, sizeof(OUT));
-
-    return dest + sizeof(OUT);
+    return dest + sizeof(int);
 }
 
 
 char* Instruction::write_OUTC(char* dest) const {
 
-    byte_t OUTC[] = {
+    *dest = POP_REG + RSI; ++dest;
 
-        POP_REG + RSI,                              // pop  rsi 
-                                                    //
-        EXT_REG, PUSH_REG + R11,                    // push r11
-        QWORD_OP, 0xFF, 0xCC,                       // dec  rsp
-                                                    //
-        0x40, 0x88, 0x34, 0x24,                     // mov  byte [rsp], sil
-                                                    //
-        MOV_NUM + RAX, 0x01, 0x00, 0x00, 0x00,      // mov  eax, 1   ;write
-        QWORD_OP, MOV_REG, Operand(3, RSP, RSI),    // mov  rsi, rsp ;from [rsp]
-        MOV_NUM + RDI, 0x01, 0x00, 0x00, 0x00,      // mov  edi, 1   ;to STDOUT
-        MOV_NUM + RDX, 0x01, 0x00, 0x00, 0x00,      // mov  edx, 1   ;1 symbol
-        WIDE_OP, SYSCALL,                           // syscall
-                                                    //
-        QWORD_OP, 0xFF, 0xC4,                       // inc  rsp
-        EXT_REG, POP_REG + R11                      // pop  r11
-    };
+    *dest = CALL_NEAR;  ++dest;
+    *reinterpret_cast<int*>(dest) = OUTC_PTR - (dest + sizeof(int));
 
-    memcpy(dest, OUTC, sizeof(OUTC));
-
-    return dest + sizeof(OUTC);
+    return dest + sizeof(int);
 }
 
 
