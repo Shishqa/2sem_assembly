@@ -57,6 +57,22 @@ char* Instruction::write_MATH(char* dest) const {
 }
 
 
+char* Instruction::write_DIV(char* dest) const {
+
+    byte_t DIV[] = {
+        POP_REG + RBX,
+        POP_REG + RAX,
+        QWORD_OP, XOR, Operand(3, RDX, RDX),
+        QWORD_OP, 0xF7, 0xF8 + RBX,
+        PUSH_REG + RAX
+    };
+
+    memcpy(dest, DIV, sizeof(DIV));
+
+    return dest + sizeof(DIV);
+}
+
+
 char* Instruction::write_IN(char* dest) const {
 
     byte_t IN[] = { 

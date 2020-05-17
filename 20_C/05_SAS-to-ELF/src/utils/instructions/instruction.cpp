@@ -82,8 +82,11 @@ char* Instruction::write() const {
         case _ADD:
         case _SUB:
         case _MUL:
-        case _DIV:
             dest = write_MATH(dest);
+            break;
+
+        case _DIV:
+            dest = write_DIV(dest);
             break;
 
         case _POP:

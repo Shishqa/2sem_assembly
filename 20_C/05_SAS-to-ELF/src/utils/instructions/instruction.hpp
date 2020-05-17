@@ -46,6 +46,7 @@ private:
     // TO BE GENERATED
     char* write_END  (char* dest) const;
     char* write_MATH (char* dest) const;
+    char* write_DIV  (char* dest) const;
     char* write_PUSH (char* dest) const;
     char* write_POP  (char* dest) const;
     char* write_IN   (char* dest) const;

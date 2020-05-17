@@ -4,9 +4,16 @@
         section .text
 
 _start:
-        mov     rsi, 65
+        push    12
+        push    4
 
-        call    .test_outc
+        pop     rbx
+        pop     rax
+        xor     rdx, rdx
+        idiv    rbx
+
+        mov     rsi, rax
+        call    .test_out
 
         mov     rax, 60
         xor     rdi, rdi
