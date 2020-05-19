@@ -8,7 +8,7 @@ SRC	:= src
 #LIB		:= ../old_libs/mslib
 
 #LIBRARIES	:= -lMSLib
-EXECUTABLE	:= sastoelf64
+EXECUTABLE	:= sastoelf
 
 all: $(BIN)/$(EXECUTABLE)
 

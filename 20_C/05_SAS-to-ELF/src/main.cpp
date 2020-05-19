@@ -19,9 +19,12 @@ int main(int argc, const char** argv) {
             throw std::runtime_error("no input specified");
         }
 
-        input_filename = argv[1];
+        if (!strncmp(argv[1], "--help", 6)) {
+            print_help();
+            return 0;
+        }
 
-        std::cout << "input: " << input_filename << "\n";
+        input_filename = argv[1];
 
         for (int arg_it = 2; arg_it < argc; ++arg_it) {
 
@@ -29,22 +32,17 @@ int main(int argc, const char** argv) {
 
                 if (arg_it < argc - 1) {
                     output_filename = argv[++arg_it];
-                    std::cout << "writing to " << output_filename << "\n";
                 } else {
                     throw std::runtime_error("no -o flag path specified");
                 }
 
             } else if (!strncmp(argv[arg_it], "--optimize", 10)) {
                 
-                std::cout << "using sse\n";
+                Utils::use_optimization(true); 
 
             } else if (!strncmp(argv[arg_it], "--quiet", 7)) {
 
-                std::cout << "quiet\n";
-
-            } else if (!strncmp(argv[arg_it], "--force", 7)) {
-
-                std::cout << "force translation\n";
+                Utils::extra_info(false);
 
             } else {
 
@@ -53,7 +51,7 @@ int main(int argc, const char** argv) {
             }
         }
 
-        sas_to_elf64(input_filename, output_filename);
+        Utils::sas_to_elf64(input_filename, output_filename);
 
     } catch (const std::runtime_error& ex) {
         print_error(ex);
@@ -64,28 +62,26 @@ int main(int argc, const char** argv) {
 
 void print_error(const std::runtime_error& ex) {
 
-    std::cerr << "   " << ex.what() << "\n\n";
-    print_help();
+    fprintf(stderr, "\033[1;31mError: \033[0m%s\n"
+                    "Use \033[1;33m./sastoelf --help\033[0m for more information\n", 
+                    ex.what());
 }
 
 void print_help() {
 
-    std::cout << "   SAS to elf x86_64 binary converter HELP                \n"
-                 "                                                          \n"
-                 "   Usage: ./sastoelf64 [input.bin] <options>              \n"
-                 "                                                          \n"
-                 "      -o [output path]                                    \n"
-                 "          if you want to specify custom output path       \n"
-                 "                                                          \n"
-                 "      --optimize                                          \n"
-                 "          optimize program                                \n"
-                 "                                                          \n"
-                 "      --quiet                                             \n"
-                 "          to mute warnings                                \n"
-                 "                                                          \n"
-                 "      --force {UNSAFE}                                    \n"
-                 "          force translation: leave nop command where      \n"
-                 "          there is no suitable x86_64 instruction         \n"
-                 "          instead of terminating the process              \n"
-                 "                                                          \n";
+    printf( "   SAS to elf x86_64 binary converter HELP                \n"
+            "                                                          \n"
+            "   Usage: ./sastoelf [input.bin] <options>                \n"
+            "                                                          \n"
+            "      --help                                              \n"
+            "          to show this useful information                 \n"
+            "                                                          \n"
+            "      -o [output path]                                    \n"
+            "          if you want to specify custom output path       \n"
+            "                                                          \n"
+            "      --optimize                                          \n"
+            "          optimize program                                \n"
+            "                                                          \n"
+            "      --quiet                                             \n"
+            "          to mute warnings                                \n" );
 }

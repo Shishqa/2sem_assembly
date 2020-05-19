@@ -8,6 +8,25 @@
 #include "utils.hpp"
 #include "instructions/config/defines.hpp"
 
+namespace Utils {
+
+void use_optimization(bool value) {
+    optimize_flag = value;
+}
+
+void extra_info(bool value) {
+    info_flag = value;
+}
+
+void print_info(const char* msg) {
+
+    if (!info_flag) {
+        return;
+    }   
+
+    printf("\033[1;36m$$\033[0m %s\n", msg);
+}   
+
 void sas_to_elf64(const char* in_file, const char* out_file) {
 
     char* buffer = nullptr;
@@ -24,13 +43,16 @@ void sas_to_elf64(const char* in_file, const char* out_file) {
         Vector<Instruction> x64bit_codes = std::move(encode_sas(buffer    + SAS_SIGN_SIZE, 
                                                                 file_size - SAS_SIGN_SIZE));
      
-        optimize_codes(x64bit_codes);
+        if (optimize_flag) {
+            optimize_codes(x64bit_codes);
+        }
 
         write_elf(out_file, x64bit_codes);
 
         delete[] buffer;
 
     } catch (const std::runtime_error& ex) {
+
         delete[] buffer;
         throw ex;
     }
@@ -38,6 +60,8 @@ void sas_to_elf64(const char* in_file, const char* out_file) {
 
 
 size_t read_from_file(const char* path, char*& buf) {
+
+    print_info("reading from source");
 
     std::ifstream in_fs(path, std::ifstream::binary);
 
@@ -81,6 +105,8 @@ Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
 
 void optimize_codes(Vector<Instruction>& codes) {
 
+    print_info("optimizing code");
+
     size_t n_codes = codes.size();
     const char* buf_begin = Instruction::get_buf_begin();
 
@@ -95,12 +121,14 @@ void optimize_codes(Vector<Instruction>& codes) {
 
             codes[++i].mute();
     
-            std::cout << "optimized push-pop";
+            print_info("\toptimized push-pop -> mov");
 
         } else if (*codes[i].opcode == _JMP && 
                    codes[i].arg[0]->val - (codes[i].opcode - buf_begin) ==
                    sizeof(Argument) + 1) {
             codes[i].mute();
+
+            print_info("\toptimized zero jump");
         }
             
     }
@@ -108,6 +136,8 @@ void optimize_codes(Vector<Instruction>& codes) {
 
 
 void write_elf(const char* path, const Vector<Instruction>& codes) {
+
+    print_info("writing to output");
 
     std::ofstream out_fs(path, std::ofstream::binary);
 
@@ -162,3 +192,5 @@ size_t codes_to_buf(const Vector<Instruction>& codes, char*& buf) {
 
     return buf_ptr - buf;
 }
+
+};

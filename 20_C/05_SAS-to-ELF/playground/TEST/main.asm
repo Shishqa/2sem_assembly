@@ -5,22 +5,6 @@
 
 _start:
 
-        mov     ebx, 2
-
-        xor     edx, edx
-        mov     eax, -10
-
-        cmp     eax, 0
-        jge     .div
-
-        mov     edx, -1
-
-.div:
-        idiv    ebx
-
-        mov     esi, eax
-        call    .test_out
-
         mov     rax, 60
         xor     rdi, rdi
         syscall
