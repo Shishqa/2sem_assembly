@@ -27,7 +27,7 @@ Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size);
 
 /* optimize:
  */
-Vector<Instruction> optimize(const Vector<Instruction>& codes);
+void optimize_codes(Vector<Instruction>& codes);
 
 /* write elf:
  *      Write an array of instructions to elf file

@@ -23,6 +23,9 @@ void Instruction::set_buf_begin(const char* begin) {
     buf_begin = begin;
 }
 
+const char* Instruction::get_buf_begin() {
+    return buf_begin;
+}
 
 void Instruction::resize_offsets(const size_t& size) {
     offsets = std::move(Vector<char*>(size, nullptr));
@@ -50,9 +53,9 @@ Instruction::Instruction(const char* op_ptr) :
 
 
 Instruction::Instruction(Instruction&& other) :
-        is_active(other.is_active),
         arg(std::move(other.arg)), 
-        opcode(other.opcode) {
+        opcode(other.opcode), 
+        is_active(other.is_active) {
     $DBG std::cout << "moved instruction\n";
 }
 
@@ -64,10 +67,6 @@ size_t Instruction::n_args() const {
 
 char* Instruction::write(char* dest) const {
 
-    if (!is_active) {
-        return dest;
-    }
-
     if (!buf_begin) {
         throw std::runtime_error("Instruction::buf_begin is not set");
     } else if (static_cast<size_t>(opcode - buf_begin) >= offsets.size()) {
@@ -75,6 +74,10 @@ char* Instruction::write(char* dest) const {
     }
 
     offsets[opcode - buf_begin] = dest;
+
+    if (!is_active) {
+        return dest;
+    }
 
     switch(*opcode) {
 
@@ -160,15 +163,18 @@ void Instruction::fix_jmp() const {
         return;
     }
 
-    char* addr = offsets[opcode - buf_begin];
     char op = *opcode;
 
-    addr += ((op == _JMP || op == _CALL) ? 1 : 6);
+    char* addr = offsets[opcode - buf_begin] + 
+                 ((op == _JMP || op == _CALL) ? 1 : 6);
 
     char* target_addr = offsets[arg[0]->val];
 
     if (!target_addr) {
-        throw std::runtime_error("jmp address is not aligned");
+        std::cout << "my addr = " << opcode - buf_begin << "\n";
+        std::cout << "bad addr" << arg[0]->val << "\n";
+        return;
+        ;throw std::runtime_error("jmp address is not aligned");
     }
 
     int new_offset  = target_addr - (addr + sizeof(int));

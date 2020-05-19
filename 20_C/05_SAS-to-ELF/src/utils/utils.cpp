@@ -6,6 +6,7 @@
 #include "simple_vector/vector.hpp"
 #include "elf_custom.hpp"
 #include "utils.hpp"
+#include "instructions/config/defines.hpp"
 
 void sas_to_elf64(const char* in_file, const char* out_file) {
 
@@ -23,7 +24,7 @@ void sas_to_elf64(const char* in_file, const char* out_file) {
         Vector<Instruction> x64bit_codes = std::move(encode_sas(buffer    + SAS_SIGN_SIZE, 
                                                                 file_size - SAS_SIGN_SIZE));
      
-        //TODO: OPTIMISATIONS
+        optimize_codes(x64bit_codes);
 
         write_elf(out_file, x64bit_codes);
 
@@ -57,6 +58,7 @@ size_t read_from_file(const char* path, char*& buf) {
     return file_size;
 }
 
+
 Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
 
     Vector<Instruction> codes;
@@ -76,9 +78,22 @@ Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
     return codes;
 }
 
-/*
- *TODO: OPTIMIZE
- */
+
+void optimize_codes(Vector<Instruction>& codes) {
+
+    size_t n_codes = codes.size();
+
+    for (size_t i = 0; i < n_codes; ++i) {
+            
+        if (*codes[i].opcode == _JMP && 
+            codes[i].arg[0]->val - (codes[i].opcode - Instruction::get_buf_begin()) ==
+            sizeof(Argument) + 1) {
+            std::cout << "optimized\n";
+            codes[i].mute();
+        }
+            
+    }
+}
 
 
 void write_elf(const char* path, const Vector<Instruction>& codes) {
@@ -111,9 +126,6 @@ void write_elf(const char* path, const Vector<Instruction>& codes) {
 }
 
 size_t codes_to_buf(const Vector<Instruction>& codes, char*& buf) {
-
-    /*TODO: FILL JMPs
-     */
 
     size_t buf_size = 100000; 
 

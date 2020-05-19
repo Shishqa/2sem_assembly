@@ -10,7 +10,9 @@ struct Instruction {
 
     static void set_buf_begin(const char* begin);
     static void resize_offsets(const size_t& size);
-    
+
+    static const char* get_buf_begin();
+
     static char* write_preamble(char* dest);
 
     //
@@ -37,12 +39,12 @@ struct Instruction {
 
     void mute();
 
+    Vector<const Argument*> arg;
+    const char* opcode;
+
 private:
 
     bool is_active;
-
-    Vector<const Argument*> arg;
-    const char* opcode;
 
     static const char* buf_begin;
     static Vector<char*> offsets;
