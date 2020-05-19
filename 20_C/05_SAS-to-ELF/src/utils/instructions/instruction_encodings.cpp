@@ -188,14 +188,14 @@ char* Instruction::write_MUL(char* dest) const {
 char* Instruction::write_DIV(char* dest) const {
 
     byte_t DIV[] = {
-        POP_REG + RBX,
-        POP_REG + RAX,
-        XOR, Operand(3, RDX, RDX),
-        0x83, 0xF8, 0x00,
-        0x7D, 0x05,
-        0xBA, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xF7, 0xF8 + RBX,
-        PUSH_REG + RAX
+        POP_REG + RBX,                          // pop  rbx
+        POP_REG + RAX,                          // pop  rax
+        XOR, Operand(3, RDX, RDX),              // xor  edx, edx
+        0x83, 0xF8, 0x00,                       // cmp  eax, 0
+        0x7D, 0x05,                             // jge  .div >----------------*
+        MOV_NUM + RDX, 0xFF, 0xFF, 0xFF, 0xFF,  // mov  edx, 0xFFFFFFFF ; -1  |
+        0xF7, 0xF8 + RBX,                       // idiv ebx <-----------------*
+        PUSH_REG + RAX                          // push rax
     };
 
     memcpy(dest, DIV, sizeof(DIV));
@@ -334,53 +334,55 @@ char* Instruction::write_JCOND(char* dest) const {
 
     const Argument* arg1 = arg[0];
 
-    *dest = POP_REG + RBX;          ++dest;
-    *dest = POP_REG + RAX;          ++dest;
-    *dest = CMP_REG;                ++dest;
-    *dest = Operand(3, RBX, RAX);   ++dest;
+    byte_t JMP[] = {
+        POP_REG + RBX,                          // pop rax
+        POP_REG + RAX,                          // pop rbx
+        CMP_REG, Operand(3, RBX, RAX),          // cmp eax, ebx
+        WIDE_OP, 0x00, 0xFF, 0xFF, 0xFF, 0xFF   // j* {val}
+    };
+    unsigned char* j_op = JMP + 5;
 
-    *dest = WIDE_OP;                ++dest;
+    *reinterpret_cast<int*>(JMP + 6) = arg1->val;
 
     switch (*opcode) {
     
         case _JA:
-            *dest = JG_NEAR;
+            *j_op = JG_NEAR;
             break;
 
         case _JAE:
-            *dest = JGE_NEAR;
+            *j_op = JGE_NEAR;
             break;
 
         case _JB:
-            *dest = JL_NEAR;
+            *j_op = JL_NEAR;
             break;
 
         case _JBE:
-            *dest = JLE_NEAR;
+            *j_op = JLE_NEAR;
             break;
 
         case _JE:
-            *dest = JE_NEAR;
+            *j_op = JE_NEAR;
             break;
 
         case _JNE:
-            *dest = JNE_NEAR;
+            *j_op = JNE_NEAR;
             break;
 
         default:
             throw std::runtime_error("not yet implemented");
             break;
     }
+    
+    memcpy(dest, JMP, sizeof(JMP));
 
-    ++dest;
-    *reinterpret_cast<int*>(dest) = arg1->val;  
-
-    return dest + sizeof(arg1->val);
+    return dest + sizeof(JMP);
 }
 
 char* Instruction::write_RET(char* dest) const {
 
-    *dest = RET_NEAR;
+    *dest = RET_NEAR; // ret
 
     return dest + 1;
 }
@@ -388,11 +390,11 @@ char* Instruction::write_RET(char* dest) const {
 char* Instruction::write_SQRT(char* dest) const {
 
     byte_t SQRT[] = {
-        POP_REG + RAX,
-        0xF2, 0x0F, 0x2A, 0xC0,
-        0xF2, 0x0F, 0x51, 0xC0,
-        0xF2, 0x0F, 0x2C, 0xC0,
-        PUSH_REG + RAX
+        POP_REG + RAX,              // pop       rax
+        0xF2, 0x0F, 0x2A, 0xC0,     // cvtsi2sd  xmm0, eax
+        0xF2, 0x0F, 0x51, 0xC0,     // sqrtsd    xmm0, xmm0
+        0xF2, 0x0F, 0x2C, 0xC0,     // cvttsd2si eax, xmm0
+        PUSH_REG + RAX              // push      rax
     };
 
     memcpy(dest, SQRT, sizeof(SQRT));
