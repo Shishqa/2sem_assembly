@@ -141,22 +141,22 @@ char* Instruction::write_END(char* dest) const {
 
 char* Instruction::write_MATH(char* dest) const {
 
-    byte_t PRE[] = { 
-        POP_REG + RBX,           // pop rbx
-        POP_REG + RAX,           // pop rax
-    };                                         
-
-    memcpy(dest, PRE, sizeof(PRE));
-    dest += sizeof(PRE);
+    byte_t OP[] = { 
+        POP_REG + RBX,                  // pop      rbx
+        POP_REG + RAX,                  // pop      rax
+        0x00, Operand(3, RBX, RAX),     // add/sub  eax, ebx
+        PUSH_REG + RAX                  // push     rax
+    };        
+    static const size_t OP_OFFSET = 2;
 
     switch(*opcode) {
 
         case _ADD:
-            *dest = ADD;
+            OP[OP_OFFSET] = ADD;
             break;
 
         case _SUB:
-            *dest = SUB;
+            OP[OP_OFFSET] = SUB;
             break;
 
         default:
@@ -164,22 +164,19 @@ char* Instruction::write_MATH(char* dest) const {
             break;
     }
 
-    byte_t POST[2] = { Operand(3, RBX, RAX),
-                       PUSH_REG + RAX        };
+    memcpy(dest, OP, sizeof(OP));             
 
-    memcpy(++dest, POST, sizeof(POST));             
-
-    return dest + sizeof(POST);
+    return dest + sizeof(OP);
 }
 
 
 char* Instruction::write_MUL(char* dest) const {
 
     byte_t MUL[] = {
-        POP_REG + RBX,
-        POP_REG + RAX,
-        WIDE_OP, IMUL, Operand(3, RAX, RBX),
-        PUSH_REG + RAX
+        POP_REG + RBX,                          // pop  rbx
+        POP_REG + RAX,                          // pop  rax
+        WIDE_OP, IMUL, Operand(3, RAX, RBX),    // imul eax, ebx
+        PUSH_REG + RAX                          // push rax
     };
 
     memcpy(dest, MUL, sizeof(MUL));
