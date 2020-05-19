@@ -31,16 +31,18 @@ struct Instruction {
 
     size_t n_args() const;
 
-    void set_addr(char* addr) const;
-
-    char* write() const;
+    char* write(char* dest) const;
 
     void fix_jmp() const;
 
-    Vector<const Argument*> arg;
-    const char* opcode;
+    void mute();
 
 private:
+
+    bool is_active;
+
+    Vector<const Argument*> arg;
+    const char* opcode;
 
     static const char* buf_begin;
     static Vector<char*> offsets;
@@ -49,7 +51,6 @@ private:
     static const char* OUT_PTR;
     static const char* OUTC_PTR;
 
-    // TO BE GENERATED
     char* write_END   (char* dest) const;
     char* write_MATH  (char* dest) const;
     char* write_MUL   (char* dest) const;

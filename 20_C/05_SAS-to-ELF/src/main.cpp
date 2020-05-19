@@ -34,15 +34,15 @@ int main(int argc, const char** argv) {
                     throw std::runtime_error("no -o flag path specified");
                 }
 
-            } else if (!strncmp(argv[arg_it], "-sse", 5)) {
+            } else if (!strncmp(argv[arg_it], "--optimize", 10)) {
                 
                 std::cout << "using sse\n";
 
-            } else if (!strncmp(argv[arg_it], "-q", 3)) {
+            } else if (!strncmp(argv[arg_it], "--quiet", 7)) {
 
                 std::cout << "quiet\n";
 
-            } else if (!strncmp(argv[arg_it], "-f", 3)) {
+            } else if (!strncmp(argv[arg_it], "--force", 7)) {
 
                 std::cout << "force translation\n";
 
@@ -77,13 +77,13 @@ void print_help() {
                  "      -o [output path]                                    \n"
                  "          if you want to specify custom output path       \n"
                  "                                                          \n"
-                 "      -sse                                                \n"
-                 "          to prefer sse instructions when it's possible   \n"
+                 "      --optimize                                          \n"
+                 "          optimize program                                \n"
                  "                                                          \n"
-                 "      -q                                                  \n"
+                 "      --quiet                                             \n"
                  "          to mute warnings                                \n"
                  "                                                          \n"
-                 "      -f {UNSAFE}                                         \n"
+                 "      --force {UNSAFE}                                    \n"
                  "          force translation: leave nop command where      \n"
                  "          there is no suitable x86_64 instruction         \n"
                  "          instead of terminating the process              \n"

@@ -288,18 +288,3 @@ DEF_CMD (24, OUTF, FLOAT, 4, 1, 1,
     printf ("%lf", tmp_val);
 })
 
-
-DEF_CMD (34, DUMP_RAM, SYS, 8, 0, 0,
-{
-	printf ("dump:\n");
-	for (int i = 0; i < 50; i++)
-	{
-		printf ("%d\n", ram[RAM_SIZE + i]);
-	}
-	MCUR (1)
-})
-
-
-
-
-

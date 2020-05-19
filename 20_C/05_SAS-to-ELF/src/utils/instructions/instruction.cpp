@@ -29,7 +29,8 @@ void Instruction::resize_offsets(const size_t& size) {
 }
 
 
-Instruction::Instruction(const char* op_ptr) {
+Instruction::Instruction(const char* op_ptr) :
+        is_active(true) {
 
     if (!op_ptr) {
         throw std::runtime_error("passing NULL to Instruction constructor");
@@ -49,6 +50,7 @@ Instruction::Instruction(const char* op_ptr) {
 
 
 Instruction::Instruction(Instruction&& other) :
+        is_active(other.is_active),
         arg(std::move(other.arg)), 
         opcode(other.opcode) {
     $DBG std::cout << "moved instruction\n";
@@ -60,7 +62,11 @@ size_t Instruction::n_args() const {
 }
 
 
-void Instruction::set_addr(char* addr) const {
+char* Instruction::write(char* dest) const {
+
+    if (!is_active) {
+        return dest;
+    }
 
     if (!buf_begin) {
         throw std::runtime_error("Instruction::buf_begin is not set");
@@ -68,13 +74,7 @@ void Instruction::set_addr(char* addr) const {
         throw std::runtime_error("Instruction::offsets is not resized properly");
     }
 
-    offsets[opcode - buf_begin] = addr;
-}
-
-
-char* Instruction::write() const {
-
-    char* dest = offsets[opcode - buf_begin];
+    offsets[opcode - buf_begin] = dest;
 
     switch(*opcode) {
 
@@ -152,6 +152,10 @@ char* Instruction::write() const {
 
 void Instruction::fix_jmp() const {
 
+    if (!is_active) {
+        return;
+    }
+
     if (!IS_JMP[static_cast<size_t>(*opcode)]) {
         return;
     }
@@ -171,3 +175,7 @@ void Instruction::fix_jmp() const {
 
     *reinterpret_cast<int*>(addr) = new_offset;
 }
+
+void Instruction::mute() {
+    is_active = false;
+}   
