@@ -82,13 +82,24 @@ Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
 void optimize_codes(Vector<Instruction>& codes) {
 
     size_t n_codes = codes.size();
+    const char* buf_begin = Instruction::get_buf_begin();
 
     for (size_t i = 0; i < n_codes; ++i) {
+           
+        if (*codes[i].opcode == _PUSH && *codes[i + 1].opcode == _POP) {
             
-        if (*codes[i].opcode == _JMP && 
-            codes[i].arg[0]->val - (codes[i].opcode - Instruction::get_buf_begin()) ==
-            sizeof(Argument) + 1) {
-            std::cout << "optimized\n";
+            *const_cast<char*>(codes[i].opcode) = _MOV;
+
+            codes[i].arg.resize(2);
+            codes[i].arg[1] = codes[i + 1].arg[0];
+
+            codes[++i].mute();
+    
+            std::cout << "optimized push-pop";
+
+        } else if (*codes[i].opcode == _JMP && 
+                   codes[i].arg[0]->val - (codes[i].opcode - buf_begin) ==
+                   sizeof(Argument) + 1) {
             codes[i].mute();
         }
             
