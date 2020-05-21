@@ -52,6 +52,7 @@ private:
     static const char* IN_PTR;
     static const char* OUT_PTR;
     static const char* OUTC_PTR;
+    static const char* OUTF_PTR;
 
     char* write_END   (char* dest) const;
     char* write_MATH  (char* dest) const;
@@ -67,6 +68,7 @@ private:
     char* write_JCOND (char* dest) const;
     char* write_RET   (char* dest) const;
     char* write_SQRT  (char* dest) const;
+    char* write_OUTF  (char* dest) const;
 };
 
 #endif//SAS_INSTRUCTIONS_HPP    

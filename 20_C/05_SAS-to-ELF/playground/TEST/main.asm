@@ -5,6 +5,11 @@
 
 _start:
 
+        mov     rsi, -12000
+        mov     rcx, 1
+
+        call    .test_outf
+
         mov     rax, 60
         xor     rdi, rdi
         syscall
@@ -69,6 +74,90 @@ _start:
         ret
 
 ;==================================================
+.test_outf:
+
+        push    r11
+        sub     rsp, 16
+
+        mov     r11, 1
+        cmp     esi, 0
+        jge     .continue_1
+
+        xor     r11, r11
+        neg     rsi
+
+.continue_1:
+
+        push    rcx
+        mov     rbx, 10
+
+        lea     rdi, [rsp + 16]
+        std
+
+.before_dot:
+
+        xor     edx, edx
+        mov     eax, esi
+        idiv    ebx
+
+        mov     esi, eax
+        mov     al, dl
+        add     al, '0'
+
+        stosb
+
+        dec     rcx
+        jnz     .before_dot    
+
+.dot:
+        pop     rcx
+        inc     rcx
+
+        mov     al, '.'
+        stosb
+
+.after_dot:
+
+        xor     edx, edx
+        mov     eax, esi
+        idiv    ebx
+
+        mov     esi, eax
+        mov     al, dl
+        add     al, '0'
+
+        stosb
+        inc     rcx
+
+        cmp     esi, 0
+        jne     .after_dot
+
+.print_sign_1:
+
+        cmp     r11, 0
+        jne     .positive_1
+
+        mov     byte [rdi], '-'
+        inc     rcx
+        jmp     .print_1
+
+.positive_1:
+
+        inc     rdi
+
+.print_1:
+        mov     rax, 1
+        mov     rsi, rdi
+        mov     rdi, 1
+        mov     rdx, rcx
+        syscall
+
+        add     rsp, 16
+        pop     r11
+
+        ret
+
+;====================================================
 
 .test_out:
 

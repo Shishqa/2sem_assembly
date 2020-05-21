@@ -18,6 +18,7 @@ Vector<char*> Instruction::offsets;
 const char* Instruction::IN_PTR = nullptr;
 const char* Instruction::OUT_PTR = nullptr;
 const char* Instruction::OUTC_PTR = nullptr;
+const char* Instruction::OUTF_PTR = nullptr;
 
 void Instruction::set_buf_begin(const char* begin) {
     buf_begin = begin;
@@ -142,6 +143,10 @@ char* Instruction::write(char* dest) const {
 
         case _SQRT:
             dest = write_SQRT(dest);
+            break;
+
+        case _OUTF:
+            dest = write_OUTF(dest);
             break;
 
         default:
