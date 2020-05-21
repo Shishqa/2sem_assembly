@@ -10,7 +10,7 @@ char* Instruction::write_preamble(char* dest) {
     
     byte_t IN[] = { 
         EXT_REG, PUSH_REG + R11,                    // push  r11
-        QWORD_OP, 0x83, 0xEC, 0x0B,                 // sub   rsp, 11
+        QWORD_OP, 0x83, 0xEC, 0x10,                 // sub   rsp, 16
                                                     //
         QWORD_OP, XOR, Operand(3, RAX, RAX),        // xor   rax, rax ;read
         QWORD_OP, MOV_REG, Operand(3, RSP, RSI),    // mov   rsi, rsp ;to [rsp]
@@ -36,7 +36,7 @@ char* Instruction::write_preamble(char* dest) {
         QWORD_OP, ADD, Operand(3, RAX, RDI),        // add   rdi, rax     |  |
         0xEB, 0xF0,                                 // jmp   .continue >--*  |
                                                     //                       |
-        QWORD_OP, 0x83, 0xC4, 0x0B,                 // sub   rsp, 0xb <------*
+        QWORD_OP, 0x83, 0xC4, 0x10,                 // sub   rsp, 16 <-------*
         0x49, 0x0F, 0xAF, 0xFB,                     // imul  rdi, r11
         0x41, 0x5B,                                 // pop   r11
         RET_NEAR                                    // ret
@@ -45,7 +45,7 @@ char* Instruction::write_preamble(char* dest) {
     byte_t OUT[] = { 
 
         EXT_REG, PUSH_REG + R11,                    // push  r11 
-        QWORD_OP, 0x83, 0xEC, 0x0B,                 // sub   rsp, 11
+        QWORD_OP, 0x83, 0xEC, 0x10,                 // sub   rsp, 16
                                                     //
         0x41, 0xBB, 0x01, 0x00, 0x00, 0x00,         // mov   r11d, 1
         0x83, 0xFE, 0x00,                           // cmp   rsi, 0
@@ -83,7 +83,7 @@ char* Instruction::write_preamble(char* dest) {
         QWORD_OP, MOV_REG, Operand(3, RCX, RDX),    // mov   rdx, rcx ;RCX symbols
         WIDE_OP, SYSCALL,                           // syscall
                                                     //
-        QWORD_OP, 0x83, 0xC4, 0x0B,                 // add   rsp, 11
+        QWORD_OP, 0x83, 0xC4, 0x10,                 // add   rsp, 16
         EXT_REG, POP_REG + R11,                     // pop   r11
         RET_NEAR                                    // ret
     };             
@@ -101,7 +101,7 @@ char* Instruction::write_preamble(char* dest) {
         MOV_NUM + RDX, 0x01, 0x00, 0x00, 0x00,      // mov  edx, 1   ;1 symbol
         WIDE_OP, SYSCALL,                           // syscall
                                                     //
-        QWORD_OP, 0xFF, 0xC4,                       // inc  rsp
+        QWORD_OP, 0xFF, 0xC0 + RSP,                 // inc  rsp
         EXT_REG, POP_REG + R11,                     // pop  r11
         RET_NEAR                                    // ret
     };
