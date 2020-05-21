@@ -6,7 +6,7 @@
 #include "simple_vector/vector.hpp"
 #include "elf_custom.hpp"
 #include "utils.hpp"
-#include "instructions/config/defines.hpp"
+#include "instructions/config/sas_instructions.hpp"
 
 namespace Utils {
 

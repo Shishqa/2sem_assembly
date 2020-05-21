@@ -1,5 +1,5 @@
-#ifndef SAS_INSTRUCTIONS_HPP
-#define SAS_INSTRUCTIONS_HPP
+#ifndef INSTRUCTION_HPP
+#define INSTRUCTION_HPP
 
 #include <cstdlib>
 
@@ -71,4 +71,4 @@ private:
     char* write_OUTF  (char* dest) const;
 };
 
-#endif//SAS_INSTRUCTIONS_HPP    
+#endif//INSTRUCTION_HPP    

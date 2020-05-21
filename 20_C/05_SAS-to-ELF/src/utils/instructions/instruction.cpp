@@ -4,7 +4,7 @@
 
 #include "instruction.hpp"
 #include "../simple_vector/vector.hpp"
-#include "config/defines.hpp"
+#include "config/sas_instructions.hpp"
 
 #ifdef DEBUG
     #define $DBG    if(1)
