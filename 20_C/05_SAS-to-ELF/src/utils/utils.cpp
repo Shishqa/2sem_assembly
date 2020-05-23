@@ -166,10 +166,10 @@ void write_elf(const char* path, const Vector<Instruction>& codes) {
 
 size_t codes_to_buf(const Vector<Instruction>& codes, char*& buf) {
 
-    static const size_t MAX_BUF_SIZE = 100000; 
-    static const size_t SAFETY_GAP   = 20;
+    static const long int MAX_BUF_SIZE = 100000; 
+    static const long int SAFETY_GAP   = 20;
 
-    buf = new char[buf_size];
+    buf = new char[MAX_BUF_SIZE];
     char* buf_ptr = buf;
 
     try {

@@ -26,7 +26,8 @@ enum EXT_REGISTERS {
 enum SYSTEM {
     SYSCALL = 0x05,
     CLD     = 0xFC,
-    STD     = 0xFD
+    STD     = 0xFD,
+    WIDE_OP = 0x0F
 };
 
 enum STRING {
@@ -34,10 +35,11 @@ enum STRING {
     LODSB = 0xAC
 };
 
-enum EXTENTIONS {
-    QWORD_OP = 0x48,
-    EXT_REG  = 0x41,
-    WIDE_OP  = 0x0F,
+enum REX {
+    REX      = 0x40,
+    REX_B    = 0x41,
+    REX_W    = 0x48,
+    REX_WB   = 0x49,
     REX_WRB  = 0x4D
 };
 
@@ -73,6 +75,8 @@ enum MATH {
     SUB  = 0x29,
     IMUL = 0xAF,
     XOR  = 0x33,
+    INC  = 0xC0,
+    DEC  = 0xC8
 };
 
 #endif //X86_DEFINES_HPP

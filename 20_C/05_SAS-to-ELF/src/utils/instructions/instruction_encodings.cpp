@@ -42,22 +42,22 @@ char* Instruction::write_END(char* dest) const {
 
 char* Instruction::write_MATH(char* dest) const {
 
-    byte_t OP[] = { 
-        POP_REG + RBX,                  // pop      rbx
-        POP_REG + RAX,                  // pop      rax
-        0x00, Operand(3, RBX, RAX),     // add/sub  eax, ebx
-        PUSH_REG + RAX                  // push     rax
+    byte_t MATH[] = { 
+        POP_REG + RBX,             // pop      rbx
+        POP_REG + RAX,             // pop      rax
+        0x00, OP(3, RBX, RAX),     // add/sub  eax, ebx
+        PUSH_REG + RAX             // push     rax
     };        
     static const size_t OP_OFFSET = 2;
 
     switch(*opcode) {
 
         case _ADD:
-            OP[OP_OFFSET] = ADD;
+            MATH[OP_OFFSET] = ADD;
             break;
 
         case _SUB:
-            OP[OP_OFFSET] = SUB;
+            MATH[OP_OFFSET] = SUB;
             break;
 
         default:
@@ -65,19 +65,18 @@ char* Instruction::write_MATH(char* dest) const {
             break;
     }
 
-    memcpy(dest, OP, sizeof(OP));             
-
-    return dest + sizeof(OP);
+    memcpy(dest, MATH, sizeof(MATH));             
+    return dest + sizeof(MATH);
 }
 
 
 char* Instruction::write_MUL(char* dest) const {
 
     byte_t MUL[] = {
-        POP_REG + RBX,                          // pop  rbx
-        POP_REG + RAX,                          // pop  rax
-        WIDE_OP, IMUL, Operand(3, RAX, RBX),    // imul eax, ebx
-        PUSH_REG + RAX                          // push rax
+        POP_REG + RBX,                     // pop  rbx
+        POP_REG + RAX,                     // pop  rax
+        WIDE_OP, IMUL, OP(3, RAX, RBX),    // imul eax, ebx
+        PUSH_REG + RAX                     // push rax
     };
 
     memcpy(dest, MUL, sizeof(MUL));
@@ -89,14 +88,14 @@ char* Instruction::write_MUL(char* dest) const {
 char* Instruction::write_DIV(char* dest) const {
 
     byte_t DIV[] = {
-        POP_REG + RBX,                          // pop  rbx
-        POP_REG + RAX,                          // pop  rax
-        XOR, Operand(3, RDX, RDX),              // xor  edx, edx
-        0x83, 0xF8, 0x00,                       // cmp  eax, 0
-        0x7D, 0x05,                             // jge  .div >----------------*
-        MOV_NUM + RDX, 0xFF, 0xFF, 0xFF, 0xFF,  // mov  edx, 0xFFFFFFFF ; -1  |
-        0xF7, 0xF8 + RBX,                       // idiv ebx <-----------------*
-        PUSH_REG + RAX                          // push rax
+        POP_REG + RBX,                      // pop  rbx
+        POP_REG + RAX,                      // pop  rax
+        XOR, OP(3, RDX, RDX),               // xor  edx, edx
+        0x83, 0xF8, 0x00,                   // cmp  eax, 0
+        0x7D, 0x05,                         // jge  .div >----------------*
+        MOV_NUM + RDX, 0xFF,0xFF,0xFF,0xFF, // mov  edx, 0xFFFFFFFF ; -1  |
+        0xF7, 0xF8 + RBX,                   // idiv ebx <-----------------*
+        PUSH_REG + RAX                      // push rax
     };
 
     memcpy(dest, DIV, sizeof(DIV));
@@ -168,13 +167,13 @@ char* Instruction::write_PUSH(char* dest) const {
 
         CHECK_REG(arg1)
 
-        *dest = EXT_REG;                ++dest; 
+        *dest = REX_B;                  ++dest; 
         *dest = PUSH_REG + arg1->reg;   ++dest;
 
         return dest;
 
     } else {
-        throw std::runtime_error("not yet implemented push combination");
+        throw std::runtime_error("not yet implemented push operands");
     }
 }
 
@@ -186,13 +185,13 @@ char* Instruction::write_POP(char* dest) const {
         
         CHECK_REG(arg1)
 
-        *dest = EXT_REG;                ++dest;
+        *dest = REX_B;                  ++dest;
         *dest = POP_REG + arg1->reg;    ++dest;
 
         return dest;
 
     } else {
-        throw std::runtime_error("not yet implemented");
+        throw std::runtime_error("not yet implemented pop operands");
     }
 }
 
@@ -203,21 +202,21 @@ char* Instruction::write_MOV(char* dest) const {
 
     if (arg1->reg_param && arg2->reg_param) {
         
-        *dest = REX_WRB;                            ++dest;
-        *dest = MOV_REG;                            ++dest;
-        *dest = Operand(3, arg1->reg, arg2->reg);   ++dest;
+        *dest = REX_WRB;                       ++dest;
+        *dest = MOV_REG;                       ++dest;
+        *dest = OP(3, arg1->reg, arg2->reg);   ++dest;
 
     } else if (arg1->int_param && arg2->reg_param) {
 
         *dest = REX_WRB;                            ++dest;
         *dest = XOR;                                ++dest;
-        *dest = Operand(3, arg2->reg, arg2->reg);   ++dest;
-        *dest = EXT_REG;                            ++dest;
+        *dest = OP(3, arg2->reg, arg2->reg);        ++dest;
+        *dest = REX_B;                              ++dest;
         *dest = MOV_NUM + arg2->reg;                ++dest;
         *reinterpret_cast<int*>(dest) = arg1->val;  dest += sizeof(arg1->val);
 
     } else {
-        throw std::runtime_error("not yet implemented");
+        throw std::runtime_error("not yet implemented mov operands");
     }
 
     return dest;
@@ -248,15 +247,15 @@ char* Instruction::write_JCOND(char* dest) const {
 
     const Argument* arg1 = arg[0];
 
-    byte_t JMP[] = {
-        POP_REG + RBX,                          // pop rax
-        POP_REG + RAX,                          // pop rbx
-        CMP_REG, Operand(3, RBX, RAX),          // cmp eax, ebx
-        WIDE_OP, 0x00, 0xFF, 0xFF, 0xFF, 0xFF   // j* {val}
-    };
-    unsigned char* j_op = JMP + 5;
+    memcpy(dest, COMPARE, sizeof(COMPARE));
+    dest += sizeof(COMPARE);
 
-    *reinterpret_cast<int*>(JMP + 6) = arg1->val;
+    byte_t JMP[] = {
+        WIDE_OP, 0x00, 0xFF,0xFF,0xFF,0xFF   // j* {val}
+    };
+    unsigned char* j_op = JMP + 1;
+
+    *reinterpret_cast<int*>(JMP + 2) = arg1->val;
 
     switch (*opcode) {
     
@@ -290,14 +289,12 @@ char* Instruction::write_JCOND(char* dest) const {
     }
     
     memcpy(dest, JMP, sizeof(JMP));
-
     return dest + sizeof(JMP);
 }
 
 char* Instruction::write_RET(char* dest) const {
 
     *dest = RET_NEAR; // ret
-
     return dest + 1;
 }
 
@@ -312,6 +309,7 @@ char* Instruction::write_SQRT(char* dest) const {
     };
 
     memcpy(dest, SQRT, sizeof(SQRT));
-
     return dest + sizeof(SQRT);
 }
+
+

@@ -5,6 +5,7 @@
 #include "instruction.hpp"
 #include "../simple_vector/vector.hpp"
 #include "config/sas_instructions.hpp"
+#include "config/standard_implementations.hpp"
 
 #ifdef DEBUG
     #define $DBG    if(1)
@@ -171,7 +172,7 @@ void Instruction::fix_jmp() const {
     char op = *opcode;
 
     char* addr = offsets[opcode - buf_begin] + 
-                 ((op == _JMP || op == _CALL) ? 1 : 6);
+                 ((op == _JMP || op == _CALL) ? 1 : 2 + sizeof(COMPARE));
 
     char* target_addr = offsets[arg[0]->val];
 

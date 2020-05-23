@@ -8,12 +8,12 @@
         throw std::runtime_error("unsupported register used");  \
     }
 
-struct Operand {
+struct OP {
     volatile char r_m : 3;
     volatile char reg : 3;
     volatile char mod : 2;
 
-    Operand(const char& _mod, const char& _reg, const char& _r_m) {
+    OP(const char& _mod, const char& _reg, const char& _r_m) {
         mod = _mod;
         reg = _reg;
         r_m = _r_m;
