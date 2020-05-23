@@ -4,6 +4,12 @@
 #include "tools.hpp"
 #include "x86_defines.hpp"
 
+static const byte_t END[] = {
+    MOV_NUM + RAX, 0x3C, 0x00, 0x00, 0x00,      // mov   rax, 0x3C ; exit
+    QWORD_OP, XOR, Operand(3, RDI, RDI),        // xor   rdi, rdi  ; 0
+    WIDE_OP, SYSCALL                            // syscall
+};                     
+
 static const byte_t IN[] = {
 
     // IN:    -

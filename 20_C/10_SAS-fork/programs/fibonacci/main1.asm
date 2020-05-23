@@ -1,63 +1,15 @@
 	JMP 	start_
 	
 start_:
-    
-    PUSH    77
-    OUTC
-    PUSH    58
-    OUTC
-	IN
-	POP		cx
 
-    PUSH    78
-    OUTC
-    PUSH    61
-    OUTC
-	IN
-	POP		dx
+    PUSH    45
+	POP	    ax
 
-	PUSH	cx
-	PUSH	1
-	JE		all_
-	JMP		one_
-	
-one_:
-
-	MOV	    dx ax
 	CALL 	fibonacci	; ax == n, bx == F_n
-	PUSH	bx
-	OUT		
-    PUSH    10
+	
+    PUSH    68
     OUTC
-	JMP		end_
-	
-all_:
 
-	MOV	    0 ax
-	JMP		cycle
-	
-cycle:
-
-	PUSH	ax
-	PUSH	dx
-	JA		cycle_end
-	MOV	    0 bx
-	CALL 	fibonacci	; ax == n, bx == F_n
-	PUSH 	bx
-	OUT 	
-    PUSH    10
-    OUTC
-	PUSH	ax
-	PUSH	1
-	ADD
-	POP		ax
-	JMP		cycle
-
-cycle_end:
-
-	JMP		end_
-	
-end_:
 	END
 	
 ;==========================================================

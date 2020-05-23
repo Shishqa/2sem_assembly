@@ -24,8 +24,7 @@ public:
 int main() {
 
     const size_t HASHTABLE_SIZE = 0x4000;
-
-    //std::unordered_map<std::string, int, HashCRC32, StrEqual> hash_table(HASHTABLE_SIZE);
+//std::unordered_map<std::string, int, HashCRC32, StrEqual> hash_table(HASHTABLE_SIZE);
 
     HashTable<std::string, int, HashCRC32, StrEqual> hash_table(HASHTABLE_SIZE);
 

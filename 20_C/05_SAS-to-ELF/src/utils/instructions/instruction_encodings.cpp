@@ -35,12 +35,7 @@ char* Instruction::write_preamble(char* dest) {
 
 char* Instruction::write_END(char* dest) const {
 
-    const byte_t END[10] = {MOV_NUM + RAX, 0x3C, 0x00, 0x00, 0x00, // mov rax, 0x3C 
-                            QWORD_OP, XOR, Operand(3, RDI, RDI),   // xor rdi, rdi  
-                            WIDE_OP, SYSCALL};                     // syscall
-
     memcpy(dest, END, sizeof(END));
-
     return dest + sizeof(END);
 }
 
