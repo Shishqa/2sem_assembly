@@ -10,11 +10,21 @@
 namespace Utils {
 
     static bool optimize_flag = false;
+    /*
+     * Change optimize_flag value
+     */
     void use_optimization(bool value); 
 
     static bool info_flag = true;
+    /*
+     * Change info_flag value
+     */
     void extra_info(bool value);
 
+    /*
+     * Print msg to the screen
+     * with cyan "$$" at the beginning
+     */
     void print_info(const char* msg);
 
     /* sas_to_elf64:
@@ -36,6 +46,15 @@ namespace Utils {
     Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size);
 
     /* optimize:
+     *      Optimize some moments:
+     *
+     *      | push <arg1>       
+     *      | pop  <arg2> ---> | mov <arg2>, <arg1>
+     *
+     *      | jmp .next
+     *      | .next:      ---> | <...>
+     *      | <...>
+     * 
      */
     void optimize_codes(Vector<Instruction>& codes);
 
