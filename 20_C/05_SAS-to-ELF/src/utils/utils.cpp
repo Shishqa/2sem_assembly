@@ -102,7 +102,6 @@ Vector<Instruction> encode_sas(const char* buf, const size_t& buf_size) {
     return codes;
 }
 
-
 void optimize_codes(Vector<Instruction>& codes) {
 
     print_info("optimizing code");
@@ -126,11 +125,10 @@ void optimize_codes(Vector<Instruction>& codes) {
         } else if (*codes[i].opcode == _JMP && 
                    codes[i].arg[0]->val - (codes[i].opcode - buf_begin) ==
                    sizeof(Argument) + 1) {
-            codes[i].mute();
 
+            codes[i].mute();
             print_info("\toptimized zero jump");
-        }
-            
+        }           
     }
 }
 
@@ -168,7 +166,8 @@ void write_elf(const char* path, const Vector<Instruction>& codes) {
 
 size_t codes_to_buf(const Vector<Instruction>& codes, char*& buf) {
 
-    size_t buf_size = 100000; 
+    static const size_t MAX_BUF_SIZE = 100000; 
+    static const size_t SAFETY_GAP   = 20;
 
     buf = new char[buf_size];
     char* buf_ptr = buf;
@@ -178,7 +177,12 @@ size_t codes_to_buf(const Vector<Instruction>& codes, char*& buf) {
         buf_ptr = Instruction::write_preamble(buf_ptr);
 
         for (size_t i = 0; i < codes.size(); ++i) {
+
             buf_ptr = codes[i].write(buf_ptr);
+
+            if (buf_ptr - buf >= MAX_BUF_SIZE - SAFETY_GAP) {
+                throw std::runtime_error("very big program");
+            }
         }
 
         for (size_t i = 0; i < codes.size(); ++i) {
