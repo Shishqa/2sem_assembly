@@ -12,9 +12,15 @@ public:
 
     Image() = delete;
 
-    explicit Image(const char* path);
+    explicit Image(FILE* in_fd);
 
     Image(const Image& other);
+
+    Image& operator=(const Image& other) = delete;
+
+    Image(Image&& other);
+
+    Image& operator=(Image&& other) = delete;
 
     ~Image();
 
@@ -23,19 +29,19 @@ public:
 
     uint32_t** pixbuf;
 
-    friend std::ostream& operator<<(std::ostream& out, const Image& img);
+    void write(FILE* out_fd) const;
 
 private:
 
-    static const size_t MAX_PREAMBLE_SIZE = 200;
-    static const size_t MAX_HEIGHT        = 1000;
-    static const size_t MAX_WIDTH         = 1000;
-
-    char* info;
+    char* buf;
 
     size_t _width;
     size_t _height;
+    size_t _buf_size;
     size_t _info_size;
+    size_t _pixbuf_offset;
+
+    static const size_t ALIGN = 16;
 };
 
 #endif //INC_05_IMG_BLEND_IMAGE_H

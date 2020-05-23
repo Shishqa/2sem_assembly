@@ -10,9 +10,11 @@
 class Blender {
 
 public:
-    static void blend_images_sse(const Image& front, const Image& back, Image& dest, const size_t& n_runs = 1);
+    static void blend_images_sse(const Image& front, const Image& back, 
+                                 Image& dest, const size_t& n_runs = 1);
 
-    static void blend_images_no_sse(const Image& front, const Image& back, Image& dest, const size_t& n_runs = 1);
+    static void blend_images(const Image& front, const Image& back, 
+                             Image& dest, const size_t& n_runs = 1);
 };
 
 #endif //INC_05_IMG_BLEND_BLENDER_H

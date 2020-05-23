@@ -153,7 +153,7 @@ void Blender::blend_images_sse(const Image& front, const Image& back, Image& des
     }
 }
 
-void Blender::blend_images_no_sse(const Image& front, const Image& back, Image& dest, const size_t& n_runs) {
+void Blender::blend_images(const Image& front, const Image& back, Image& dest, const size_t& n_runs) {
 
     const size_t WIDTH = front.width();
     const size_t HEIGHT = front.height();

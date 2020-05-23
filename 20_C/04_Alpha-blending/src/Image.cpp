@@ -2,74 +2,117 @@
 // Created by shishqa on 4/30/20.
 //
 
+#define NDEBUG
+
+#ifdef NDEBUG
+    #define $DBG if(0) 
+#else 
+    #define $DBG if(1)
+#endif
+
 #include "Image.h"
 #include <cstdio>
+#include <cassert>
 
 Image::Image(const Image& other) :
         _width(other._width),
         _height(other._height),
-        _info_size(other._info_size) {
+        _buf_size(other._buf_size),
+        _info_size(other._info_size),
+        _pixbuf_offset(other._pixbuf_offset) {
 
-    info = new char[_info_size];
+    buf = new(std::align_val_t{ALIGN}) char[_buf_size];
 
-    for (size_t i = 0; i < _info_size; ++i) {
-        info[i] = other.info[i];
+    for (size_t i = 0; i < _buf_size; ++i) {
+        buf[i] = other.buf[i];
     }
 
     pixbuf = new uint32_t*[_height];
 
+    uint32_t* pix_ptr = reinterpret_cast<uint32_t*>(buf + _pixbuf_offset);
+
+    assert(reinterpret_cast<uintptr_t>(pix_ptr) % ALIGN == 0);
+
     for (size_t y = 0; y < _height; ++y) {
-        pixbuf[y] = new uint32_t[_width];
-        for (size_t x = 0; x < _width; ++x) {
-            pixbuf[y][x] = other.pixbuf[y][x];
-        }
+        pixbuf[y] = pix_ptr;
+        pix_ptr += _width;
     }
+
+    $DBG printf("copied img\n");
 }
 
-Image::Image(const char* path) :
+Image::Image(Image&& other) {
+    
+    if (&other == this) {
+        throw std::runtime_error("incorrect assignment");
+    }
+
+    _width         = other._width;
+    _height        = other._height;
+    _buf_size      = other._buf_size;
+    _info_size     = other._info_size;
+    _pixbuf_offset = other._pixbuf_offset;
+
+    buf = other.buf;
+    other.buf = nullptr;
+
+    pixbuf = other.pixbuf;
+    other.pixbuf = nullptr;
+
+    if (reinterpret_cast<uintptr_t>(pixbuf) % ALIGN != 0) {
+        throw std::runtime_error("misaligned ptr");
+    }
+
+    $DBG printf("moved img\n");
+}
+
+Image::Image(FILE* in_fd) :
         _info_size(0) {
 
-    FILE* in_fd = fopen(path, "r");
-
-    if (!in_fd) {
-        throw std::runtime_error("can't open file");
-    }
+    fseek(in_fd, 0, SEEK_END);
+    _buf_size = ftell(in_fd);
 
     fseek(in_fd, 10, SEEK_SET);
-    fread(reinterpret_cast<void*>(&_info_size), sizeof(uint32_t), 1, in_fd);
+    fread(reinterpret_cast<char*>(&_info_size), sizeof(uint32_t), 1, in_fd);
     fseek(in_fd, 0, SEEK_SET);
 
-    info = new char[_info_size];
+    const size_t align_delta = ALIGN - _info_size % ALIGN;
 
-    fread(reinterpret_cast<void*>(info), sizeof(char), _info_size, in_fd);
+    _pixbuf_offset = _info_size + align_delta;
+    _buf_size  += align_delta;
 
-    _width = *reinterpret_cast<uint32_t*>(&info[18]);
-    _height = *reinterpret_cast<uint32_t*>(&info[22]);
+    $DBG printf("info_size     = %lu\n"
+                "buf_size      = %lu\n"
+                "pixbuf_offset = %lu\n",
+                _info_size, _buf_size, _pixbuf_offset);
 
-    if (_width > MAX_WIDTH || _height > MAX_HEIGHT) {
-        delete info;
-        throw std::runtime_error("very big image");
-    }
+    buf = new(std::align_val_t{ALIGN}) char[_buf_size]; 
+
+    fread(buf,                  sizeof(char), _info_size,                 in_fd);
+    fread(buf + _pixbuf_offset, sizeof(char), _buf_size - _pixbuf_offset, in_fd);
+
+    _width  = *reinterpret_cast<uint32_t*>(&buf[18]);
+    _height = *reinterpret_cast<uint32_t*>(&buf[22]);
 
     pixbuf = new uint32_t*[_height];
 
-    for (size_t y = 0; y < _height; ++y) {
-        pixbuf[y] = new uint32_t[_width];
-        fread(reinterpret_cast<void*>(pixbuf[y]), sizeof(uint32_t), _width, in_fd);
-    }
+    uint32_t* pix_ptr = reinterpret_cast<uint32_t*>(buf + _pixbuf_offset);
 
-    fclose(in_fd);
+    $DBG printf("pixbuf starts at %p\n"
+                "align of ptr = %lu\n", 
+                pix_ptr, alignof(*pix_ptr));
+
+    assert(reinterpret_cast<uintptr_t>(pix_ptr) % ALIGN == 0);
+
+    for (size_t y = 0; y < _height; ++y) {
+        pixbuf[y] = pix_ptr;
+        pix_ptr += _width;
+    }
 }
 
 Image::~Image() {
-
-    delete[] info;
-
-    for (size_t y = 0; y < _height; ++y) {
-        delete[] pixbuf[y];
-    }
-
-    delete[] pixbuf;
+    ::operator delete(buf, std::align_val_t{ALIGN});
+    $DBG printf("img deleted\n");
 }
 
 size_t Image::width() const {
@@ -80,24 +123,8 @@ size_t Image::height() const {
     return _height;
 }
 
-std::ostream& operator<<(std::ostream& out, const Image& img) {
-
-    for (size_t i = 0; i < img._info_size; ++i) {
-        out << img.info[i];
-    }
-
-    uint32_t curr_pixel = 0;
-
-    for (size_t y = 0; y < img._height; ++y) {
-        for (size_t x = 0; x < img._width; ++x) {
-
-            curr_pixel = img.pixbuf[y][x];
-
-            for (size_t i = 0; i < 4; ++i, curr_pixel >>= 8) {
-                out << static_cast<char>(curr_pixel & 0xFF);
-            }
-        }
-    }
-
-    return out;
+void Image::write(FILE* out_fd) const {
+    fwrite(buf,                  sizeof(char), _info_size,                 out_fd);
+    fwrite(buf + _pixbuf_offset, sizeof(char), _buf_size - _pixbuf_offset, out_fd);
+    $DBG printf("img written\n");
 }
