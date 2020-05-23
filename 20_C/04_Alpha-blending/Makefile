@@ -4,7 +4,7 @@ CXX_FLAGS := -Wall -Wextra -std=c++17 -ggdb -msse4.2
 BIN	:= bin
 SRC := src
 
-EXECUTABLE := blender
+EXECUTABLE := blend
 
 all: $(BIN)/$(EXECUTABLE)
 
