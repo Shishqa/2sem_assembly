@@ -94,7 +94,7 @@ BINT_TEST   equ 2121
 OINT_TEST   equ 9898
 XINT_TEST   equ 1024
 
-format2:    db 'I %s %x%d%%%c%b, %d %s!' , 0xA, 0
+format2:    db 'bad flag -> %t I %s %x%d%%%c%b, %d %s! %y <- there was bad flag' , 0xA, 0
 lovestr:    db 'love', 0
 meowstr:    db 'meow', 0
 

@@ -78,7 +78,7 @@ printf:
             xchg    byte [rdi], bl                  ; '0' <-> '%'
 
             cmp     byte [rdi], 0                   ; if met '0', exit
-            je      .exit
+            je      global_exit
 
             inc     rdi
             call    parse_flag                      ; parse current flag
@@ -91,7 +91,7 @@ printf:
             inc     r8
             jmp     .printf_loop
 
-.exit:
+global_exit:
             pop     rbx                             ; restore RBX
             pop     rbp                             ; restore RBP
 
@@ -144,8 +144,8 @@ DINT_FLAG   equ 'd'
 parse_flag:
             push    rdi                             ; save current position
 
-            xor     rax, rax
-            mov     al, byte [rdi]
+            xor     rax, rax                        ; rax = 0
+            mov     al, byte [rdi]                  ; al = current flag
 
             cmp     al, SHIELD_FLAG                 ; if shielded symbol
             je      .is_shield                      ; (just print it)
@@ -157,20 +157,25 @@ parse_flag:
             jmp     .exit
 
 .is_flag:
-            mov     rsi, qword [rbp]
+            mov     rsi, qword [rbp]                ; rsi = current argument
 
-            sub     al, BINT_FLAG
-            cmp     al, SIZEOF_TABLE
-            ja      .exit
-
-            call    qword [module_table + 8*rax]
+            sub     al, BINT_FLAG                   
+            cmp     al, SIZEOF_TABLE                ; error if al is bigger
+            ja      .err_exit                       ; than table size
+                                                    
+            call    qword [module_table + 8*rax]    ; use call-table
 
 .exit:
             pop     rdi                             ; restore current position
-
             ret
 
-nope:       ret
+.err_exit:
+            call    nope
+
+;;-------------------------------------------------------------------------
+
+nope:       add     rsp, 3*8
+            jmp     global_exit
 
 ;;-------------------------------------------------------------------------
 
