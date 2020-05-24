@@ -14,7 +14,6 @@ enum {
 
 const char DEFAULT_FILE_OUTPUT[7] = "hacked";
 
-
 void print_help();
 
 int crack(char* input_file, char* output_file);
