@@ -24,7 +24,7 @@
 ;;         DH <- binary degree of base if binary, 0 if not
 ;;         DL <- base (<= 16)
 ;; Exit:  RDI -> addr of the last written digit
-;; Destr: RAX RBX RDX RSI ; DF
+;; Destr: RAX RBX RDX RSI ; CC
 ;;=========================================================================
 
 _itoa:

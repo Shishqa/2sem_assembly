@@ -4,6 +4,7 @@
 
 %macro      store_char 0
 
+            cld
             lea     rdi, [Buffer]
             add     rdi, qword [BufEnd]         ; RDI points to buffer end
             stosb                               ; write new char to buffer
@@ -38,7 +39,7 @@
 ;; will not appear immediately !
 ;;
 ;; ENTRY: RSI <- string address
-;; DESTR: RAX RDI
+;; DESTR: RAX RDI ; CC
 ;;=========================================================================
 
 _put_s:
@@ -68,7 +69,7 @@ _put_s:
 ;; will not appear immediately !
 ;;
 ;; Entry: SIL <- char value
-;; Destr: RAX RDI
+;; Destr: RAX RDI ; CC 
 ;;=========================================================================
 
 _put_c:

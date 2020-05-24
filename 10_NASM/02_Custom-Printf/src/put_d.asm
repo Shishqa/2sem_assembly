@@ -13,7 +13,7 @@
 ;; Writes signed int in decimal representation to the console
 ;;
 ;; ENTRY: ESI <- int number to print
-;; DESTR: RAX RBX RDX RSI RDI ; DF
+;; DESTR: RAX RBX RDX RSI RDI ; CC
 ;;=========================================================================
 
 _put_d:

@@ -39,7 +39,7 @@
 ;;
 ;;        STACK <- other args from right to left (6th on the top)
 ;;
-;; DESTR: RAX RCX RDX RSI RDI R8 ; CC
+;; DESTR: RAX RCX RDX RSI RDI R8 R11 ; CC
 ;;=========================================================================
 
 printf:
@@ -61,7 +61,7 @@ printf:
 
             push    rbx                             ; save RBX
 
-            xor     r10, r10
+            xor     r8, r8
 
 .printf_loop:
 
@@ -88,7 +88,7 @@ printf:
             je      .printf_loop                    ; prepare next arg
 
             add     rbp, 8                          ; RBP -> next arg
-            inc     r10
+            inc     r8
             jmp     .printf_loop
 
 .exit:
@@ -101,7 +101,7 @@ printf:
             add     rsp, 8 * 5
             push    rax
 
-            mov     rax, r10
+            mov     rax, r8
 
             ret
 

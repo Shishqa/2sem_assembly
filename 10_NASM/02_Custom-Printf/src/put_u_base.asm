@@ -15,7 +15,7 @@
 ;; ENTRY: ESI <- int number to print
 ;;         DH <- binary degree if base is binary / 0 if not
 ;;         DL <- base (<= 16)
-;; DESTR: RAX RBX RDX RSI RDI ; DF
+;; DESTR: RAX RBX RDX RSI RDI ; CC
 ;;=========================================================================
 
 _put_u_base:

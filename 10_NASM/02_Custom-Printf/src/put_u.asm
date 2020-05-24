@@ -15,7 +15,7 @@
 ;; Writes unsigned int in binary representation to the console
 ;;
 ;; ENTRY: ESI <- int number to print
-;; DESTR: RAX RBX RDX RSI RDI ; DF
+;; DESTR: RAX RBX RDX RSI RDI ; CC
 ;;=========================================================================
 
 _put_b:
@@ -28,7 +28,7 @@ _put_b:
 ;; Writes unsigned int in decimal representation to the console
 ;;
 ;; Entry: ESI <- int number to print
-;; Destr: RAX RBX RDX RSI RDI ; DF
+;; Destr: RAX RBX RDX RSI RDI ; CC
 ;;=========================================================================
 
 _put_u:
@@ -41,7 +41,7 @@ _put_u:
 ;; Writes unsigned int in octal representation to the console
 ;;
 ;; ENTRY: ESI <- int number to print
-;; Destr: RAX RBX RDX RSI RDI ; DF
+;; Destr: RAX RBX RDX RSI RDI ; CC
 ;;=========================================================================
 
 _put_o:
@@ -54,7 +54,7 @@ _put_o:
 ;; Writes unsigned int in hexadecimal representation to the console
 ;;
 ;; ENTRY: ESI <- int number to print
-;; DESTR: RAX RBX RDX RSI RDI ; DF
+;; DESTR: RAX RBX RDX RSI RDI ; CC
 ;;=========================================================================
 
 _put_x:
