@@ -128,7 +128,7 @@ next_flag:
 ;;
 ;; ENTRY: RDI <- position where is flag
 ;;        RBP <- address of current argument
-;; Destr: RAX RBX RCX RDX RSI ; DF
+;; Destr: RAX RBX RCX RDX RSI ; CC
 ;;=========================================================================
 
 SHIELD_FLAG equ '%'
@@ -144,7 +144,10 @@ DINT_FLAG   equ 'd'
 parse_flag:
             push    rdi                             ; save current position
 
-            cmp     byte [rdi], SHIELD_FLAG         ; if shielded symbol
+            xor     rax, rax
+            mov     al, byte [rdi]
+
+            cmp     al, SHIELD_FLAG                 ; if shielded symbol
             je      .is_shield                      ; (just print it)
             jmp     .is_flag
 
@@ -154,41 +157,40 @@ parse_flag:
             jmp     .exit
 
 .is_flag:
-            xor     rcx, rcx
-            mov     rcx, 7                          ; RCX - flag iterator
+            mov     rsi, qword [rbp]
 
-            mov     al, byte [rdi]                  ; current flag
-            mov     rsi, qword [rbp]                ; current argument
-            mov     rdi, flag_table
+            sub     al, BINT_FLAG
+            cmp     al, SIZEOF_TABLE
+            ja      .exit
 
-            cld
-            repne   scasb 
-            jne     .exit
-
-.call_suitable_func:
-
-            mov     rdi, rcx
-            mov     rcx, 6
-            sub     rcx, rdi
-
-            call    qword [call_table+8*rcx]        ; print current arg
+            call    qword [module_table + 8*rax]
 
 .exit:
             pop     rdi                             ; restore current position
 
             ret
 
+nope:       ret
+
 ;;-------------------------------------------------------------------------
 
             section .data
 
-flag_table:
-            db UINT_FLAG, DINT_FLAG, BINT_FLAG, OINT_FLAG, XINT_FLAG
-            db CHAR_FLAG, CSTR_FLAG,                                    0
+module_table: dq _put_b ; 0
+              times CHAR_FLAG-BINT_FLAG-1 dq nope
+              dq _put_c ; 1
+              times DINT_FLAG-CHAR_FLAG-1 dq nope 
+              dq _put_d ; 2    
+              times OINT_FLAG-DINT_FLAG-1 dq nope
+              dq _put_o ; 13
+              times CSTR_FLAG-OINT_FLAG-1 dq nope 
+              dq _put_s ; 17
+              times UINT_FLAG-CSTR_FLAG-1 dq nope
+              dq _put_u ; 19
+              times XINT_FLAG-UINT_FLAG-1 dq nope
+              dq _put_x ; 22
 
-call_table:
-            dq _put_u,    _put_d,    _put_b,    _put_o,    _put_x
-            dq _put_c,    _put_s,                                       0
+SIZEOF_TABLE  equ 22
 
 ;;=========================================================================
 
