@@ -16,13 +16,13 @@ _start:
             mov     esi, 8123
             call    _put_u
 
-            mov     esi, 0
-            call    _put_u
-
-            mov     esi, 99999
-            call    _put_u
-
             call    _flush_buffer
+
+            mov     rax, 1
+            mov     rdi, 1
+            mov     rsi, check
+            mov     rdx, check_len
+            syscall
 
             mov     rax, 60
             xor     rdi, rdi
@@ -30,3 +30,8 @@ _start:
 
 ;;=========================================================================
 
+            section .data
+check:      db 10, "check: 8123", 10
+check_len   equ $ - check
+
+;;=========================================================================

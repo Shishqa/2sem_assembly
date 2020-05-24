@@ -13,14 +13,24 @@
 ;;=========================================================================
 
 _start:
-            mov     esi, 102
+            mov     esi, 0x45
             call    _put_b
-
             call    _flush_buffer
 
-            mov     rax, 60
+            mov     rax, 1
+            mov     rdi, 1
+            mov     rsi, check
+            mov     rdx, check_len
+            syscall
+
+            mov     rax, 0x3C
             xor     rdi, rdi
             syscall
 
 ;;=========================================================================
 
+            section .data
+check:      db 10, "check: 1000101", 10
+check_len   equ $ - check
+
+;;=========================================================================

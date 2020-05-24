@@ -15,8 +15,13 @@
 _start:
             mov     rsi, Msg
             call    _put_s
-
             call    _flush_buffer
+
+            mov     rax, 1
+            mov     rdi, 1
+            mov     rsi, check
+            mov     rdx, check_len
+            syscall
 
             mov     rax, 60
             xor     rdi, rdi
@@ -26,7 +31,10 @@ _start:
 
             section .data
 
-Msg:        db      "Hello, world!", 10, 0
+Msg:        db "Hello, world!", 10, 0
+
+check:      db 10, "check: Hello, world!", 10, 10
+check_len   equ $ - check
 
 ;;=========================================================================
 
