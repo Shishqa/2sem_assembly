@@ -39,7 +39,7 @@
 ;;
 ;;        STACK <- other args from right to left (6th on the top)
 ;;
-;; DESTR: RAX RBX RCX RDX RSI RDI R8 ; DF
+;; DESTR: RAX RCX RDX RSI RDI R8 ; CC
 ;;=========================================================================
 
 printf:
@@ -97,11 +97,9 @@ printf:
 
             call    _flush_buffer
 
-            pop     rdi
-
-            multipop rax, rax, rax, rax, rax
-
-            push    rdi
+            pop     rax
+            add     rsp, 8 * 5
+            push    rax
 
             mov     rax, r10
 

@@ -53,6 +53,12 @@
 
             call    %1
 
+        %if %0 > 7
+
+            add     rsp, (%0 - 8) * 8
+
+        %endif
+
 %endmacro
 
 
@@ -66,12 +72,9 @@
 ;;=========================================================================
 
 _start:
-            ;invoke printf, format1, qword CHAR_TEST, CSTR_TEST, qword DINT_TEST, qword UINT_TEST, qword BINT_TEST, qword OINT_TEST, qword XINT_TEST
+            invoke printf, format1, qword CHAR_TEST, CSTR_TEST, qword DINT_TEST, qword UINT_TEST, qword BINT_TEST, qword OINT_TEST, qword XINT_TEST
 
             invoke printf, format2, lovestr, qword 3802, qword 10000000, qword '!', qword 127, qword 101, meowstr
-
-
-;            invoke printf, frmt, rsp, rsp
 
             mov     rax, 60
             xor     rdi, rdi
@@ -80,8 +83,6 @@ _start:
 ;;-------------------------------------------------------------------------
 
             section .data
-
-frmt:       db "[gs:30] = %x and [gs:30] = %x", 10, 0
 
 CHAR_TEST   equ 'G'
 
@@ -98,14 +99,14 @@ lovestr:    db 'love', 0
 meowstr:    db 'meow', 0
 
 format1:    db "Test formats:", 10
-            db "%%c: %c", 9,9,9,9,  "(should be 'G')",      10
-            db "%%s: %s",                                   10
-            db "%%d: %d", 9,9,9,    "(should be -8625d)",   10
-            db "%%u: %u", 9,9,9,    "(should be 235123d)",  10
-            db "%%b: %b", 9,9,      "(should be 2121d)",    10
-            db "%%o: %o", 9,9,9,    "(should be 9898d)",    10
-            db "%%x: %x", 9,9,9,9,  "(should be 1024d)",    10
-            db "Done",                                      10, 0
+            db "%%c: %c", 9,9,9,9,  "(should be 'G')",         10
+            db "%%s: %s",                                      10
+            db "%%d: %d", 9,9,9,    "(should be -8625)",       10
+            db "%%u: %u", 9,9,9,    "(should be 235123)",      10
+            db "%%b: %b", 9,9,      "(should be 100001001001)",10
+            db "%%o: %o", 9,9,9,    "(should be 23252)",       10
+            db "%%x: %x", 9,9,9,9,  "(should be 400)",         10
+            db "Done",                                         10, 0
 
 ;;=========================================================================
 
